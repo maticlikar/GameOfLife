@@ -3,7 +3,8 @@ const container = document.querySelector('.container');
 const startButton = document.querySelector('.start');
 const speedInput = document.querySelector('.speed');
 
-let size = 80;
+let size = 50;
+let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
 
@@ -11,9 +12,7 @@ let updateTime = 500; // In milliseconds
 let myInterval = 0;
 let isPaused = true;
 
-createGrid(size, grid);
-
-let cells = document.getElementsByClassName('cell');
+let cells = createGrid(size, grid);
 
 startButton.addEventListener('click', togglePause);
 speedInput.addEventListener('change', updateSpeed);
@@ -36,34 +35,42 @@ function rules() {
     let kill = [];
     let revive = [];
 
-    for (let i = 0; i < cells.length; i++) {
-      let neighbors = countNeighbors(i, cells);
+    for (let i = 0; i < totalSize; i++) {
+      for (let j = 0; j < totalSize; j++) {
+        let neighbors = countNeighbors(i, j, cells);
 
-      if(cells[i].classList.contains('alive')) {
-        if(neighbors < 2 || neighbors > 3) {
-          kill.push(i);
+        if(cells[i][j].classList.contains('alive')) {
+          if(neighbors < 2 || neighbors > 3) {
+            kill.push([i, j]);
+          }
         }
-      }
 
-      if(cells[i].classList.contains('dead')) {
-        if(neighbors == 3) {
-          revive.push(i);
+        if(cells[i][j].classList.contains('dead')) {
+          if(neighbors == 3) {
+            revive.push([i, j]);
+          }
         }
       }
     }
 
     for(let i = 0; i < kill.length; i++) {
-      let cellIndex = kill[i];
+      let cellIndicies = kill[i];
 
-      cells[cellIndex].classList.remove('alive');
-      cells[cellIndex].classList.add('dead');
+      let row = cellIndicies[0];
+      let col = cellIndicies[1];
+
+      cells[row][col].classList.remove('alive');
+      cells[row][col].classList.add('dead');
     }
 
     for(let i = 0; i < revive.length; i++) {
-      let cellIndex = revive[i];
-      
-      cells[cellIndex].classList.remove('dead');
-      cells[cellIndex].classList.add('alive');
+      let cellIndicies = revive[i];
+
+      let row = cellIndicies[0];
+      let col = cellIndicies[1];
+
+      cells[row][col].classList.remove('dead');
+      cells[row][col].classList.add('alive');
     }
   }
 }
@@ -85,21 +92,40 @@ function updateSpeed() {
 }
 
 function createGrid(size, grid) {
-  for (let i = 0; i < size * size; i++) {
-    let cell = document.createElement('DIV'); 
-    cell.classList.add('cell');
-    cell.classList.add('dead');
-    cell.id = i;
+  let cells = [];
 
-    // The '- 2' comes from the fact that the borders for each cell are 1px on each side
-    cell.style.width = ((initWidth/size) - 2).toString() + 'px';
-    cell.style.height = ((initHeight/size) - 2).toString() + 'px';
-
-    grid.appendChild(cell);
-
-
-    cell.addEventListener('click', toggleCellState);
+  for (let i = 0; i < totalSize; i++) {
+    cells[i] = [];
   }
+
+  for (let i = 0; i < totalSize; i++) {
+    for (let j = 0; j < totalSize; j++) {
+      let cell = document.createElement('DIV'); 
+      cell.classList.add('cell');
+      cell.classList.add('dead');
+      cell.id = i + " " + j;
+
+      let min = size;
+      let max = size + (size - 1);
+
+      // Only set the middle ones as visible
+      if(!(i >= min && i <= max && j >= min && j <= max)) {
+        cell.style.display = 'none';
+      }
+
+      // The '- 2' comes from the fact that the borders for each cell are 1px on each side
+      cell.style.width = ((initWidth/size) - 2).toString() + 'px';
+      cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+
+      cells[i][j] = cell;
+
+      grid.appendChild(cell);
+
+      cell.addEventListener('click', toggleCellState);
+    } 
+  }
+
+  return cells;
 }
 
 function toggleCellState() {
@@ -112,71 +138,55 @@ function toggleCellState() {
   }
 }
 
-function countNeighbors(index, cells) {
+function countNeighbors(i, j, cells) {
   let count = 0;
 
-  if(index - size - 1 > 0) {
-    if(index >= size && index % size != 0) {
-      let cell = document.getElementById((index - size - 1).toString());
-   
-      if(cell.classList.contains('alive')) { count++; }
-    }
+  if(i - 1 >= 0 && j - 1 > 0) {
+    let cell = cells[i - 1][j - 1];
+
+    if(cell.classList.contains('alive')) { count++; }
   }
 
-  if(index - size > 0) {
-    if(index >= size) {
-      let cell = document.getElementById((index - size).toString());
+  if(i - 1 >= 0) {
+    let cell = cells[i - 1][j];
 
-      if(cell.classList.contains('alive')) { count++; }
-    }
+    if(cell.classList.contains('alive')) { count++; }
   }
 
-  if(index - size + 1 > 0) {
-    if(index >= size && index % size != (size - 1)) {
-      let cell = document.getElementById((index - size + 1).toString());
+  if(i - 1 >= 0 && j + 1 < totalSize) {
+    let cell = cells[i - 1][j + 1];
 
-      if(cell.classList.contains('alive')) { count++; }
-    }
+    if(cell.classList.contains('alive')) { count++; }
   }
 
-  if(index - 1 > 0) {
-    if(index % size != 0) {
-      let cell = document.getElementById((index - 1).toString());
+  if(j - 1 >= 0) {
+    let cell = cells[i][j - 1];
 
-      if(cell.classList.contains('alive')) { count++; }
-    }
+    if(cell.classList.contains('alive')) { count++; }
   }
 
-  if(index + 1 < cells.length) {
-    if(index % size != (size - 1)) {
-      let cell = document.getElementById((index + 1).toString());
+  if(j + 1 < totalSize) {
+    let cell = cells[i][j + 1];
 
-      if(cell.classList.contains('alive')) { count++; }
-    }
+    if(cell.classList.contains('alive')) { count++; }
   }
 
-  if(index + size - 1 < cells.length) {
-    if(index < size * size - size && index % size != 0) {
-      let cell = document.getElementById((index + size - 1).toString());
+  if(i + 1 < totalSize && j - 1 >= 0) {
+    let cell = cells[i + 1][j - 1];
 
-      if(cell.classList.contains('alive')) { count++; }
-    }
+    if(cell.classList.contains('alive')) { count++; }
   }
 
-  if(index + size < cells.length) {
-    if(index < size * size - size) {
-      let cell = document.getElementById((index + size).toString());
+  if(i + 1 < totalSize) {
+    let cell = cells[i + 1][j];
 
-      if(cell.classList.contains('alive')) { count++; }
-    }
+    if(cell.classList.contains('alive')) { count++; }
   }
 
-  if(index + size + 1 < cells.length) {
-    if(index < size * size - size && index % size != (size - 1)) {
-      let cell = document.getElementById((index + size + 1).toString());
+  if(i + 1 < totalSize && j + 1 < totalSize) {
+    let cell = cells[i + 1][j + 1];
 
-      if(cell.classList.contains('alive')) { count++; }
-    }
+    if(cell.classList.contains('alive')) { count++; }
   }
 
   return count;
