@@ -1,0 +1,28 @@
+.container {
+	width: 700px;
+  height: 700px;
+  border: 1px solid red;
+  float: right;
+}
+
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cell {
+  border: 1px solid black;
+}
+
+.dead {
+  background-color: gainsboro;
+}
+
+.alive {
+  background-color: black;
+}
+
+.speed {
+  display: block;
+  margin-top: 10px
+}
