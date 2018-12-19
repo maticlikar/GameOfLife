@@ -1,7 +1,8 @@
 const grid = document.querySelector('.grid');
 const container = document.querySelector('.container');
 const startButton = document.querySelector('.start');
-const speedInput = document.querySelector('.speed');
+const speedButton = document.querySelector('.submit_speed');
+const sizeButton = document.querySelector('.submit_size');
 
 let size = 50;
 let totalSize = size * 3;
@@ -15,7 +16,8 @@ let isPaused = true;
 let cells = createGrid(size, grid);
 
 startButton.addEventListener('click', togglePause);
-speedInput.addEventListener('change', updateSpeed);
+speedButton.addEventListener('click', changeUpdateTime);
+sizeButton.addEventListener('click', changeSize);
 
 startGame();
 
@@ -85,9 +87,24 @@ function togglePause() {
   }
 }
 
-function updateSpeed() {
-  updateTime = speedInput.value;
+function changeUpdateTime() {
+  updateTime = parseInt(document.querySelector('.speed_text').value);
   
+  clearInterval(myInterval);
+  
+  startGame();
+}
+
+function changeSize() {
+  size = parseInt(document.querySelector('.size_text').value);
+  totalSize = size * 3;
+  
+  while (grid.firstChild) {
+    grid.removeChild(grid.firstChild);
+  }
+
+  cells = createGrid(size, grid);
+
   startGame();
 }
 
@@ -98,15 +115,15 @@ function createGrid(size, grid) {
     cells[i] = [];
   }
 
+  let min = size;
+  let max = size + (size - 1);
+
   for (let i = 0; i < totalSize; i++) {
     for (let j = 0; j < totalSize; j++) {
       let cell = document.createElement('DIV'); 
       cell.classList.add('cell');
       cell.classList.add('dead');
       cell.id = i + " " + j;
-
-      let min = size;
-      let max = size + (size - 1);
 
       // Only set the middle ones as visible
       if(!(i >= min && i <= max && j >= min && j <= max)) {
@@ -122,6 +139,19 @@ function createGrid(size, grid) {
       grid.appendChild(cell);
 
       cell.addEventListener('click', toggleCellState);
+      cell.addEventListener('mouseover', function() {
+
+        if(this.classList.contains('dead')) {
+          this.classList.add('mouseover');
+        }
+      });
+
+      cell.addEventListener('mouseout', function() {
+        
+        if(this.classList.contains('mouseover')) {
+          this.classList.remove('mouseover');
+        }
+      });
     } 
   }
 

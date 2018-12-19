@@ -6,16 +6,30 @@
     <link href="style.css" type="text/css" rel="stylesheet">
   </head>
 
-  <div>
-    <button class="start">Start</button>
-    <input type="range" class="speed" value="500" min="10" max="2000">
+  <div class="top">
+    <div class="settings">
+      <button class="start">Start</button>
+      <div class="speed">
+        <input type="text" class="speed_text" placeholder="Update time in milliseconds">
+        <button class="submit_speed">Submit</button>
+      </div>
+
+      <div class="size">
+        <input type="text" class="size_text" placeholder="Number of cells in each row/col">
+        <button class="submit_size">Submit</button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="grid">
+
+      </div>
+    </div>
+
+    <div class="picker">
+      <p>Hello</p>
+    </div>
   </div>
-
-  <div class="container">
-    <div class="grid">
-
-    <div/>
-  <div/>
 
   <body>
     <script src="index.js"></script>

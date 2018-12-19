@@ -2,7 +2,6 @@
 	width: 700px;
   height: 700px;
   border: 1px solid red;
-  float: right;
 }
 
 .grid {
@@ -25,4 +24,26 @@
 .speed {
   display: block;
   margin-top: 10px
+}
+
+.mouseover {
+  background-color: yellow;
+}
+
+.speed {
+  border: 1px solid black;
+}
+
+.settings {
+  border: 1px solid black;
+  flex-grow: 1;
+}
+
+.top {
+  display: flex;
+}
+
+.picker {
+  border: 1px solid black;
+  flex-grow: 1;
 }
