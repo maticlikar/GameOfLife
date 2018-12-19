@@ -3,6 +3,7 @@ const container = document.querySelector('.container');
 const startButton = document.querySelector('.start');
 const speedButton = document.querySelector('.submit_speed');
 const sizeButton = document.querySelector('.submit_size');
+const toggleGridButton = document.querySelector('.toggle_grid');
 
 let size = 50;
 let totalSize = size * 3;
@@ -12,12 +13,14 @@ const initWidth = container.clientWidth;
 let updateTime = 500; // In milliseconds
 let myInterval = 0;
 let isPaused = true;
+let isGrid = true;
 
 let cells = createGrid(size, grid);
 
 startButton.addEventListener('click', togglePause);
 speedButton.addEventListener('click', changeUpdateTime);
 sizeButton.addEventListener('click', changeSize);
+toggleGridButton.addEventListener('click', toggleGrid);
 
 startGame();
 
@@ -106,6 +109,26 @@ function changeSize() {
   cells = createGrid(size, grid);
 
   startGame();
+}
+
+function toggleGrid() {
+  for (let i = 0; i < cells.length; i++) {
+    for (let j = 0; j < cells[0].length; j++) {
+      if(isGrid) {
+        cells[i][j].style.border = 'none'; 
+
+        cells[i][j].style.width = ((initWidth/size)).toString() + 'px';
+        cells[i][j].style.height = ((initHeight/size)).toString() + 'px';
+      } else { 
+        cells[i][j].style.border = '1px solid black'; 
+
+        cells[i][j].style.width = ((initWidth/size) - 2).toString() + 'px';
+        cells[i][j].style.height = ((initHeight/size) - 2).toString() + 'px';
+      }
+    }
+  } 
+
+  isGrid = !isGrid;
 }
 
 function createGrid(size, grid) {
