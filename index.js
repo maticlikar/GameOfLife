@@ -5,17 +5,18 @@ const speedButton = document.querySelector('.submit_speed');
 const sizeButton = document.querySelector('.submit_size');
 const toggleGridButton = document.querySelector('.toggle_grid');
 
-let size = 50;
+let size = 10;
 let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
 
-let updateTime = 500; // In milliseconds
+let updateTime = 1000; // In milliseconds
 let myInterval = 0;
 let isPaused = true;
 let isGrid = true;
 
 let cells = createGrid(size, grid);
+let cellsToCheck = [];
 
 startButton.addEventListener('click', togglePause);
 speedButton.addEventListener('click', changeUpdateTime);
@@ -35,26 +36,63 @@ function startGame() {
 }
 
 function rules() {
+  console.log(cellsToCheck);
   if(!isPaused) {
 
     let kill = [];
     let revive = [];
+    let newCellsToCheck = [];
 
     for (let i = 0; i < totalSize; i++) {
       for (let j = 0; j < totalSize; j++) {
-        let neighbors = getAliveNeighbors(i, j, cells);
+        let neighbors = getAllNeighbors(cells[i][j]);
+        let aliveNeighbors = 0;
+
+        for (let k = 0; k < neighbors.length; k++) {
+          if(neighbors[k].classList.contains('alive')) {
+            aliveNeighbors++;
+          }
+        }
+
+        if(i === 13 && j === 13) {
+          console.log(aliveNeighbors);
+        }
 
         if(cells[i][j].classList.contains('alive')) {
-          if(neighbors.length < 2 || neighbors.length > 3) {
+          if(aliveNeighbors < 2 || aliveNeighbors > 3) {
             kill.push([i, j]);
           }
         }
 
         if(cells[i][j].classList.contains('dead')) {
-          if(neighbors.length == 3) {
+          if(aliveNeighbors === 3) {
             revive.push([i, j]);
+
+            if(newCellsToCheck.indexOf(cells[i][j] === -1)) {
+              newCellsToCheck.push(cells[i][j]); 
+            }
+
+            for (let i = 0; i < neighbors.length; i++) {
+              if(newCellsToCheck.indexOf(neighbors[i]) === -1) {
+                newCellsToCheck.push(neighbors[i]);
+              }
+            }
           }
         }
+        
+        // Don't need to check if it doesn't have any neighbors anymore
+        if(aliveNeighbors === 0) {
+          let index = cellsToCheck.indexOf(cells[i][j]);
+          if(index > -1) { 
+            cellsToCheck.splice(index, 1);
+          }
+        }
+      }
+    }
+
+    for (let i = 0; i < newCellsToCheck.length; i++) {
+      if(cellsToCheck.indexOf(newCellsToCheck[i]) === -1) {
+        cellsToCheck.push(newCellsToCheck[i]);
       }
     }
 
@@ -188,11 +226,27 @@ function toggleCellState() {
   } else {
     this.classList.remove('dead');
     this.classList.add('alive');
+
+    if(cellsToCheck.indexOf(this) === -1) {
+      cellsToCheck.push(this); 
+    }
+
+    let neighbors = getAllNeighbors(this);
+
+    for (let i = 0; i < neighbors.length; i++) {
+      if(cellsToCheck.indexOf(neighbors[i]) === -1) {
+        cellsToCheck.push(neighbors[i]);
+      }
+    }
   }
 }
 
-function getAllNeighbors(i, j, cells) {
+function getAllNeighbors(cell) {
   let neighbors = [];
+
+  let rowAndCol = cell.id.split(' ').map(x => parseInt(x));
+  let i = rowAndCol[0];
+  let j = rowAndCol[1];
 
   if(i - 1 >= 0 && j - 1 > 0) {
     let cell = cells[i - 1][j - 1];
@@ -245,56 +299,3 @@ function getAllNeighbors(i, j, cells) {
   return neighbors;
 }
 
-function getAliveNeighbors(i, j, cells) {
-  let neighbors = [];
-
-  if(i - 1 >= 0 && j - 1 > 0) {
-    let cell = cells[i - 1][j - 1];
-
-    if(cell.classList.contains('alive')) { neighbors.push(cell) }
-  }
-
-  if(i - 1 >= 0) {
-    let cell = cells[i - 1][j];
-
-    if(cell.classList.contains('alive')) { neighbors.push(cell) }
-  }
-
-  if(i - 1 >= 0 && j + 1 < totalSize) {
-    let cell = cells[i - 1][j + 1];
-
-    if(cell.classList.contains('alive')) { neighbors.push(cell) }
-  }
-
-  if(j - 1 >= 0) {
-    let cell = cells[i][j - 1];
-
-    if(cell.classList.contains('alive')) { neighbors.push(cell) }
-  }
-
-  if(j + 1 < totalSize) {
-    let cell = cells[i][j + 1];
-
-    if(cell.classList.contains('alive')) { neighbors.push(cell) }
-  }
-
-  if(i + 1 < totalSize && j - 1 >= 0) {
-    let cell = cells[i + 1][j - 1];
-
-    if(cell.classList.contains('alive')) { neighbors.push(cell) }
-  }
-
-  if(i + 1 < totalSize) {
-    let cell = cells[i + 1][j];
-
-    if(cell.classList.contains('alive')) { neighbors.push(cell) }
-  }
-
-  if(i + 1 < totalSize && j + 1 < totalSize) {
-    let cell = cells[i + 1][j + 1];
-
-    if(cell.classList.contains('alive')) { neighbors.push(cell) }
-  }
-
-  return neighbors;
-}
