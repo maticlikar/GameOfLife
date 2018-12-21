@@ -42,16 +42,16 @@ function rules() {
 
     for (let i = 0; i < totalSize; i++) {
       for (let j = 0; j < totalSize; j++) {
-        let neighbors = countNeighbors(i, j, cells);
+        let neighbors = getAliveNeighbors(i, j, cells);
 
         if(cells[i][j].classList.contains('alive')) {
-          if(neighbors < 2 || neighbors > 3) {
+          if(neighbors.length < 2 || neighbors.length > 3) {
             kill.push([i, j]);
           }
         }
 
         if(cells[i][j].classList.contains('dead')) {
-          if(neighbors == 3) {
+          if(neighbors.length == 3) {
             revive.push([i, j]);
           }
         }
@@ -191,56 +191,110 @@ function toggleCellState() {
   }
 }
 
-function countNeighbors(i, j, cells) {
-  let count = 0;
+function getAllNeighbors(i, j, cells) {
+  let neighbors = [];
 
   if(i - 1 >= 0 && j - 1 > 0) {
     let cell = cells[i - 1][j - 1];
 
-    if(cell.classList.contains('alive')) { count++; }
+    neighbors.push(cell);
   }
 
   if(i - 1 >= 0) {
     let cell = cells[i - 1][j];
 
-    if(cell.classList.contains('alive')) { count++; }
+    neighbors.push(cell);
   }
 
   if(i - 1 >= 0 && j + 1 < totalSize) {
     let cell = cells[i - 1][j + 1];
 
-    if(cell.classList.contains('alive')) { count++; }
+    neighbors.push(cell);
   }
 
   if(j - 1 >= 0) {
     let cell = cells[i][j - 1];
 
-    if(cell.classList.contains('alive')) { count++; }
+    neighbors.push(cell);
   }
 
   if(j + 1 < totalSize) {
     let cell = cells[i][j + 1];
 
-    if(cell.classList.contains('alive')) { count++; }
+    neighbors.push(cell);
   }
 
   if(i + 1 < totalSize && j - 1 >= 0) {
     let cell = cells[i + 1][j - 1];
 
-    if(cell.classList.contains('alive')) { count++; }
+    neighbors.push(cell);
   }
 
   if(i + 1 < totalSize) {
     let cell = cells[i + 1][j];
 
-    if(cell.classList.contains('alive')) { count++; }
+    neighbors.push(cell);
   }
 
   if(i + 1 < totalSize && j + 1 < totalSize) {
     let cell = cells[i + 1][j + 1];
 
-    if(cell.classList.contains('alive')) { count++; }
+    neighbors.push(cell);
   }
 
-  return count;
+  return neighbors;
+}
+
+function getAliveNeighbors(i, j, cells) {
+  let neighbors = [];
+
+  if(i - 1 >= 0 && j - 1 > 0) {
+    let cell = cells[i - 1][j - 1];
+
+    if(cell.classList.contains('alive')) { neighbors.push(cell) }
+  }
+
+  if(i - 1 >= 0) {
+    let cell = cells[i - 1][j];
+
+    if(cell.classList.contains('alive')) { neighbors.push(cell) }
+  }
+
+  if(i - 1 >= 0 && j + 1 < totalSize) {
+    let cell = cells[i - 1][j + 1];
+
+    if(cell.classList.contains('alive')) { neighbors.push(cell) }
+  }
+
+  if(j - 1 >= 0) {
+    let cell = cells[i][j - 1];
+
+    if(cell.classList.contains('alive')) { neighbors.push(cell) }
+  }
+
+  if(j + 1 < totalSize) {
+    let cell = cells[i][j + 1];
+
+    if(cell.classList.contains('alive')) { neighbors.push(cell) }
+  }
+
+  if(i + 1 < totalSize && j - 1 >= 0) {
+    let cell = cells[i + 1][j - 1];
+
+    if(cell.classList.contains('alive')) { neighbors.push(cell) }
+  }
+
+  if(i + 1 < totalSize) {
+    let cell = cells[i + 1][j];
+
+    if(cell.classList.contains('alive')) { neighbors.push(cell) }
+  }
+
+  if(i + 1 < totalSize && j + 1 < totalSize) {
+    let cell = cells[i + 1][j + 1];
+
+    if(cell.classList.contains('alive')) { neighbors.push(cell) }
+  }
+
+  return neighbors;
 }
