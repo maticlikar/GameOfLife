@@ -21,16 +21,27 @@
   background-color: black;
 }
 
-.speed {
-  display: block;
-  margin-top: 10px
+.size {
+  border: 1px solid black;
 }
 
+.preset {
+  border: 1px solid black;
+}
 .mouseover {
   background-color: yellow;
 }
 
 .speed {
+  border: 1px solid black;
+  display: block;
+}
+
+.start {
+  border: 1px solid black;
+}
+
+.toggle_grid {
   border: 1px solid black;
 }
 

@@ -4,8 +4,9 @@ const startButton = document.querySelector('.start');
 const speedButton = document.querySelector('.submit_speed');
 const sizeButton = document.querySelector('.submit_size');
 const toggleGridButton = document.querySelector('.toggle_grid');
+const presetButton = document.querySelector('.submit_preset');
 
-let size = 100;
+let size = 50;
 let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
@@ -22,6 +23,7 @@ startButton.addEventListener('click', togglePause);
 speedButton.addEventListener('click', changeUpdateTime);
 sizeButton.addEventListener('click', changeSize);
 toggleGridButton.addEventListener('click', toggleGrid);
+presetButton.addEventListener('click', populateCells);
 
 startGame();
 
@@ -134,7 +136,7 @@ function changeSize() {
 
 function toggleGrid() {
   for (let i = 0; i < cells.length; i++) {
-    for (let j = 0; j < cells[0].length; j++) {
+    for (let j = 0; j < cells[i].length; j++) {
       if(isGrid) {
         cells[i][j].style.border = 'none'; 
 
@@ -150,6 +152,66 @@ function toggleGrid() {
   } 
 
   isGrid = !isGrid;
+}
+
+function populateCells() {
+  let preset = document.querySelector('.preset_text').value.replace(/\s/g, "");
+
+  // Converting from string to 2D array
+  preset = preset.split('[');
+  preset.splice(0, 2);
+  preset = preset.map(x => x.replace(/,/g, ''));
+  preset = preset.map(x => x.replace(/]/g, ''));
+  preset = preset.map(x => Array.from(x));
+  preset = preset.map(x => x.map(y => parseInt(y)));
+
+  if(preset.length > size) {
+    window.alert("The size of array given is larger than size of current game." +
+                 " Change the sizes to match each other.");
+    return;
+  }
+
+  // Filling the cell array
+  for (let i = 0; i < preset.length; i++) {
+
+    console.log(preset[i]);
+
+    if(preset[i].length > size) {
+      window.alert("The size of array given is larger than size of current game." +
+                   " Change the sizes to match each other.");
+      return;
+    }
+
+    for (let j = 0; j < preset[i].length; j++) {
+
+      let r = i + size;
+      let c = j + size;
+
+      if(preset[i][j]) {
+        if(cells[r][c].classList.contains('dead')) {
+          cells[r][c].classList.remove('dead');
+          cells[r][c].classList.add('alive');
+
+          if(cellsToCheck.indexOf(cells[r][c]) === -1) {
+            cellsToCheck.push(cells[r][c]); 
+          }
+
+          let neighbors = getAllNeighbors(cells[r][c]);
+
+          for (let i = 0; i < neighbors.length; i++) {
+            if(cellsToCheck.indexOf(neighbors[i]) === -1) {
+              cellsToCheck.push(neighbors[i]);
+            }
+          }
+        }
+      } else {
+        if(cells[r][c].classList.contains('alive')) {
+          cells[r][c].classList.remove('alive');
+          cells[r][c].classList.add('dead');
+        }
+      }
+    } 
+  }
 }
 
 function createGrid(size, grid) {
