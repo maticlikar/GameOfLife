@@ -5,12 +5,12 @@ const speedButton = document.querySelector('.submit_speed');
 const sizeButton = document.querySelector('.submit_size');
 const toggleGridButton = document.querySelector('.toggle_grid');
 
-let size = 10;
+let size = 100;
 let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
 
-let updateTime = 1000; // In milliseconds
+let updateTime = 500; // In milliseconds
 let myInterval = 0;
 let isPaused = true;
 let isGrid = true;
@@ -36,58 +36,51 @@ function startGame() {
 }
 
 function rules() {
-  console.log(cellsToCheck);
   if(!isPaused) {
 
     let kill = [];
     let revive = [];
     let newCellsToCheck = [];
 
-    for (let i = 0; i < totalSize; i++) {
-      for (let j = 0; j < totalSize; j++) {
-        let neighbors = getAllNeighbors(cells[i][j]);
-        let aliveNeighbors = 0;
+    for (let i = 0; i < cellsToCheck.length; i++) {
+      let neighbors = getAllNeighbors(cellsToCheck[i]);
+      let aliveNeighbors = 0;
 
-        for (let k = 0; k < neighbors.length; k++) {
-          if(neighbors[k].classList.contains('alive')) {
-            aliveNeighbors++;
+      for (let k = 0; k < neighbors.length; k++) {
+        if(neighbors[k].classList.contains('alive')) {
+          aliveNeighbors++;
+        }
+      }
+
+      if(cellsToCheck[i].classList.contains('alive')) {
+        if(aliveNeighbors < 2 || aliveNeighbors > 3) {
+          kill.push(cellsToCheck[i]);
+        }
+      }
+
+      if(cellsToCheck[i].classList.contains('dead')) {
+        if(aliveNeighbors === 3) {
+          revive.push(cellsToCheck[i]);
+
+          if(newCellsToCheck.indexOf(cellsToCheck[i] === -1)) {
+            newCellsToCheck.push(cellsToCheck[i]); 
           }
-        }
 
-        if(i === 13 && j === 13) {
-          console.log(aliveNeighbors);
-        }
-
-        if(cells[i][j].classList.contains('alive')) {
-          if(aliveNeighbors < 2 || aliveNeighbors > 3) {
-            kill.push([i, j]);
-          }
-        }
-
-        if(cells[i][j].classList.contains('dead')) {
-          if(aliveNeighbors === 3) {
-            revive.push([i, j]);
-
-            if(newCellsToCheck.indexOf(cells[i][j] === -1)) {
-              newCellsToCheck.push(cells[i][j]); 
+          for (let i = 0; i < neighbors.length; i++) {
+            if(newCellsToCheck.indexOf(neighbors[i]) === -1) {
+              newCellsToCheck.push(neighbors[i]);
             }
-
-            for (let i = 0; i < neighbors.length; i++) {
-              if(newCellsToCheck.indexOf(neighbors[i]) === -1) {
-                newCellsToCheck.push(neighbors[i]);
-              }
-            }
-          }
-        }
-        
-        // Don't need to check if it doesn't have any neighbors anymore
-        if(aliveNeighbors === 0) {
-          let index = cellsToCheck.indexOf(cells[i][j]);
-          if(index > -1) { 
-            cellsToCheck.splice(index, 1);
           }
         }
       }
+      
+      // Don't need to check it if it doesn't have any neighbors anymore
+      
+      if(aliveNeighbors === 0) {
+        cellsToCheck.splice(i, 1);
+        i--;
+      }
+      
     }
 
     for (let i = 0; i < newCellsToCheck.length; i++) {
@@ -97,23 +90,13 @@ function rules() {
     }
 
     for(let i = 0; i < kill.length; i++) {
-      let cellIndicies = kill[i];
-
-      let row = cellIndicies[0];
-      let col = cellIndicies[1];
-
-      cells[row][col].classList.remove('alive');
-      cells[row][col].classList.add('dead');
+      kill[i].classList.remove('alive');
+      kill[i].classList.add('dead');
     }
 
     for(let i = 0; i < revive.length; i++) {
-      let cellIndicies = revive[i];
-
-      let row = cellIndicies[0];
-      let col = cellIndicies[1];
-
-      cells[row][col].classList.remove('dead');
-      cells[row][col].classList.add('alive');
+      revive[i].classList.remove('dead');
+      revive[i].classList.add('alive');
     }
   }
 }
@@ -244,9 +227,9 @@ function toggleCellState() {
 function getAllNeighbors(cell) {
   let neighbors = [];
 
-  let rowAndCol = cell.id.split(' ').map(x => parseInt(x));
-  let i = rowAndCol[0];
-  let j = rowAndCol[1];
+  let rowAndCol = cell.id.split(' ');
+  let i = parseInt(rowAndCol[0]);
+  let j = parseInt(rowAndCol[1]);
 
   if(i - 1 >= 0 && j - 1 > 0) {
     let cell = cells[i - 1][j - 1];
