@@ -5,8 +5,9 @@ const speedButton = document.querySelector('.submit_speed');
 const sizeButton = document.querySelector('.submit_size');
 const toggleGridButton = document.querySelector('.toggle_grid');
 const presetButton = document.querySelector('.submit_preset');
+const convertToTextButton = document.querySelector('.convert_to_text');
 
-let size = 50;
+let size = 10;
 let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
@@ -24,6 +25,7 @@ speedButton.addEventListener('click', changeUpdateTime);
 sizeButton.addEventListener('click', changeSize);
 toggleGridButton.addEventListener('click', toggleGrid);
 presetButton.addEventListener('click', populateCells);
+convertToTextButton.addEventListener('click', convertGridToText);
 
 startGame();
 
@@ -173,9 +175,6 @@ function populateCells() {
 
   // Filling the cell array
   for (let i = 0; i < preset.length; i++) {
-
-    console.log(preset[i]);
-
     if(preset[i].length > size) {
       window.alert("The size of array given is larger than size of current game." +
                    " Change the sizes to match each other.");
@@ -212,6 +211,38 @@ function populateCells() {
       }
     } 
   }
+}
+
+function convertGridToText() {
+  let returnString = '';
+
+  returnString += '[\n';
+  for (let i = size; i < 2 * size; i++) {
+    returnString += '['
+    for (let j = size; j < 2 * size - 1; j++) {
+      if(cells[i][j].classList.contains('alive')) {
+        returnString += '1, ';
+      } else {
+        returnString += '0, ';
+      }
+    } 
+
+    if(cells[i][2 * size - 1].classList.contains('alive')) {
+      returnString += '1';
+    } else {
+      returnString += '0';
+    }
+
+    if(i < 2 * size - 1) {
+      returnString += '],\n';
+    } else {
+      returnString += ']\n';
+    }
+  }
+
+  returnString += ']';
+
+  document.querySelector('.preset_text').value = returnString;
 }
 
 function createGrid(size, grid) {
