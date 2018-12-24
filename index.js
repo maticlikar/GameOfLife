@@ -7,7 +7,7 @@ const toggleGridButton = document.querySelector('.toggle_grid');
 const presetButton = document.querySelector('.submit_preset');
 const convertToTextButton = document.querySelector('.convert_to_text');
 
-let size = 50;
+let size = 5;
 let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
@@ -126,6 +126,8 @@ function changeUpdateTime() {
 function changeSize() {
   size = parseInt(document.querySelector('.size_text').value);
   totalSize = size * 3;
+
+  cellsToCheck = [];
   
   while (grid.firstChild) {
     grid.removeChild(grid.firstChild);
@@ -158,6 +160,15 @@ function toggleGrid() {
 
 function populateCells() {
   let preset = document.querySelector('.preset_text').value.replace(/\s/g, "");
+
+  if (preset.charAt(0) >= '0' && preset.charAt(0) <= '9') {
+    let size = preset.split('[');
+    size = parseInt(size[0]);
+
+    document.querySelector('.size_text').value = size;
+
+    sizeButton.click(); 
+  }
 
   // Converting from string to 2D array
   preset = preset.split('[');
@@ -215,6 +226,8 @@ function populateCells() {
 
 function convertGridToText() {
   let returnString = '';
+
+  returnString += size + '\n';
 
   returnString += '[\n';
   for (let i = size; i < 2 * size; i++) {
@@ -324,7 +337,7 @@ function getAllNeighbors(cell) {
   let i = parseInt(rowAndCol[0]);
   let j = parseInt(rowAndCol[1]);
 
-  if(i - 1 >= 0 && j - 1 > 0) {
+  if(i - 1 >= 0 && j - 1 >= 0) {
     let cell = cells[i - 1][j - 1];
 
     neighbors.push(cell);
