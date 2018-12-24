@@ -1,3 +1,25 @@
+<--------------------------------------------------------->
+
+This is a list of preset values that you can plug into the
+preset field in the game. When you click submit, it will
+autofill the grid with the values specified. You can make
+your own presets by following the same syntax as used here:
+
+    1. (Optional) The first line is the size of the grid 
+       that you want. If not specified, it will try to fit
+       the preset into the current game.
+
+    2. Then specifiy the array to represent the grid.
+       A '1' represents a live cell while a '0' represents
+       a dead one. The syntax for the array is the same as
+       the syntax used in js to define a 2D array (namely
+       two square brackets to define the whole grid array 
+       and comma-seperated smaller arrays with 
+       comma-seperated ones and zeros to define the actual 
+       values).
+
+<--------------------------------------------------------->
+
 |-------------------|
 |----Still lifes----|
 |-------------------|
