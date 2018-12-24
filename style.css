@@ -1,3 +1,14 @@
+@import url(https://fonts.googleapis.com/css?family=Exo+2);
+
+* {
+  font-family: 'Exo 2';
+  font-size: 12px;
+}
+
+html {
+  background: lightslategray;
+}
+
 .container {
 	width: 700px;
   height: 700px;
@@ -27,6 +38,8 @@
 
 .settings {
   margin: 5px;
+  background: darkgray;
+  height: fit-content;
 }
 
 .basic_buttons {
@@ -89,6 +102,10 @@
 
 .preset {
   border: 4px solid lightgray;
+}
+
+.preset_text {
+  margin: 5px;
 }
 
 .preset_buttons {

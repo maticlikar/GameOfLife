@@ -7,7 +7,7 @@ const toggleGridButton = document.querySelector('.toggle_grid');
 const presetButton = document.querySelector('.submit_preset');
 const convertToTextButton = document.querySelector('.convert_to_text');
 
-let size = 5;
+let size = 40;
 let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
