@@ -7,7 +7,7 @@ const toggleGridButton = document.querySelector('.toggle_grid');
 const presetButton = document.querySelector('.submit_preset');
 const convertToTextButton = document.querySelector('.convert_to_text');
 
-let size = 10;
+let size = 50;
 let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
@@ -137,15 +137,15 @@ function changeSize() {
 }
 
 function toggleGrid() {
-  for (let i = 0; i < cells.length; i++) {
-    for (let j = 0; j < cells[i].length; j++) {
+  for (let i = size; i < 2 * size; i++) {
+    for (let j = size; j < 2 * size; j++) {
       if(isGrid) {
         cells[i][j].style.border = 'none'; 
 
         cells[i][j].style.width = ((initWidth/size)).toString() + 'px';
         cells[i][j].style.height = ((initHeight/size)).toString() + 'px';
       } else { 
-        cells[i][j].style.border = '1px solid black'; 
+        cells[i][j].style.border = '1px solid lightgray'; 
 
         cells[i][j].style.width = ((initWidth/size) - 2).toString() + 'px';
         cells[i][j].style.height = ((initHeight/size) - 2).toString() + 'px';
