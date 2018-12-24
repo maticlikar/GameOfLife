@@ -21,38 +21,94 @@
   background-color: black;
 }
 
-.size {
-  border: 1px solid black;
-}
-
-.preset {
-  border: 1px solid black;
-}
-
-.mouseover {
-  background-color: yellow;
-}
-
-.speed {
-  border: 1px solid black;
-  display: block;
-}
-
-.start {
-  border: 1px solid black;
-}
-
-.toggle_grid {
-  border: 1px solid black;
+.top {
+  display: flex;
 }
 
 .settings {
-  border: 1px solid black;
   margin: 5px;
 }
 
-.top {
+.basic_buttons {
   display: flex;
+  border: 4px solid lightgray;
+}
+
+.mouseover {
+  background-color: gold;
+}
+
+.speed {
+  border: 4px solid lightgray;
+  display: block;
+}
+
+.size {
+  border: 4px solid lightgray;
+}
+
+.submit_speed {
+  margin: 10px;
+  background-color: gold;
+  border: none;
+  padding: 10px;
+}
+
+.speed_text {
+  margin: 10px;
+  padding: 5px;
+}
+
+.submit_size {
+  margin: 10px;
+  background-color: gold;
+  border: none;
+  padding: 10px;
+}
+
+.size_text {
+  margin: 10px;
+  padding: 5px;
+}
+
+.start {
+  flex: 1;
+  margin: 10px;
+  background-color: gold;
+  border: none;
+  padding: 10px;
+}
+
+.toggle_grid {
+  flex: 1;
+  margin: 10px;
+  background-color: gold;
+  border: none;
+  padding: 10px;
+}
+
+.preset {
+  border: 4px solid lightgray;
+}
+
+.preset_buttons {
+  display: flex;
+}
+
+.submit_preset {
+  flex: 1;
+  margin: 10px;
+  background-color: gold;
+  border: none;
+  padding: 10px;
+}
+
+.convert_to_text {
+  flex: 1;
+  margin: 10px;
+  background-color: gold;
+  border: none;
+  padding: 10px;
 }
 
 .picker {
