@@ -9,6 +9,16 @@ html {
   background: lightslategray;
 }
 
+input {
+  background: lightgray;
+  border: none;
+}
+
+textarea {
+  background: lightgray;
+  border: none;
+}
+
 .container {
 	width: 700px;
   height: 700px;
