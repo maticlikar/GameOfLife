@@ -5,4 +5,20 @@ class Grid {
     this.size = size;
     this.totalSize = size * 3;
   }
+
+  convertGridToText() {
+
+  }
+
+  convertTextToGrid() {
+    
+  }
+
+  toggleGrid() {
+
+  }
+
+  changeSize() {
+
+  }
 }
