@@ -1,6 +1,7 @@
-class ConwayGameOfLife {
+class ConwayGameOfLife extends Game {
 
-  constructor(grid) {
+  constructor(grid, updateTime) {
+    super(updateTime);
     this.grid = grid; 
   }
 
