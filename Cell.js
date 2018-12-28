@@ -1,17 +1,25 @@
 class Cell {
 
-  constructor(grid, state, id, size) {
+  constructor(grid, row, col) {
     this.grid = grid;
-    this.state = state;
-    this.size = size;
+    this.row = row;
+    this.col = col;
 
     this.div = document.createElement('DIV');
-    div.classList.add('cell');
-    div.classList.add('dead');
+    this.div.classList.add('cell');
+    this.div.classList.add('dead');
 
-    this.id = id;
-    this.row = parseInt(id.split(' ')[0]);
-    this.col = parseInt(id.split(' ')[1]);
+    this.div.addEventListener('click', this.toggleState);
+    this.div.addEventListener('mouseover', function() {
+      this.classList.add('mouseover');
+    });
+
+    this.div.addEventListener('mouseout', function() {
+      
+      if(this.classList.contains('mouseover')) {
+        this.classList.remove('mouseover');
+      }
+    });
   }
 
   vonNeumannNeighborhood() {
@@ -23,12 +31,12 @@ class Cell {
   }
 
   toggleState() {
-    if(div.classList.contains('alive')) {
-      div.classList.remove('alive');
-      div.classList.add('dead');
+    if(this.classList.contains('alive')) {
+      this.classList.remove('alive');
+      this.classList.add('dead');
     } else {
-      div.classList.remove('dead');
-      div.classList.add('alive');
+      this.classList.remove('dead');
+      this.classList.add('alive');
     }
   }
 }

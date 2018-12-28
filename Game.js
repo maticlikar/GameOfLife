@@ -1,15 +1,15 @@
 class Game { 
   constructor(updateTime) {
     this.updateTime = updateTime;
-    this.myInterval = 0;
+    this.interval = 0;
   }
   
-  startGame() {
-    if(myInterval > 0) {
-      clearInterval(myInterval);
+  start(interval, game) {
+    if(interval > 0) {
+      clearInterval(interval);
     }
 
-    myInterval = setInterval('rules()', updateTime);
+    interval = setInterval('game.rules()', updateTime);
   }
   
   togglePause() {

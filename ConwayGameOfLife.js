@@ -6,6 +6,6 @@ class ConwayGameOfLife extends Game {
   }
 
   rules() {
-
+    console.log('hello');
   }
 }
