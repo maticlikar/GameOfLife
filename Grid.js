@@ -55,48 +55,6 @@ class Grid {
     console.log(cells);
 
     return cells;
-    /*
-    for (let i = 0; i < totalSize; i++) {
-      for (let j = 0; j < totalSize; j++) {
-        let id = i + ' ' + j;
-
-        let cell = document.createElement('DIV'); 
-        cell.classList.add('cell');
-        cell.classList.add('dead');
-        cell.id = i + " " + j;
-
-        // Only set the middle ones as visible
-        if(!(i >= min && i <= max && j >= min && j <= max)) {
-          cell.style.display = 'none';
-        }
-
-        // The '- 2' comes from the fact that the borders for each cell are 1px on each side
-        cell.style.width = ((initWidth/size) - 2).toString() + 'px';
-        cell.style.height = ((initHeight/size) - 2).toString() + 'px';
-
-        cells[i][j] = cell;
-
-        grid.appendChild(cell);
-
-        cell.addEventListener('click', toggleCellState);
-        cell.addEventListener('mouseover', function() {
-
-          if(this.classList.contains('dead')) {
-            this.classList.add('mouseover');
-          }
-        });
-
-        cell.addEventListener('mouseout', function() {
-          
-          if(this.classList.contains('mouseover')) {
-            this.classList.remove('mouseover');
-          }
-        });
-      } 
-    }
-
-    return cells;
-    */
   }
 
   toggleGrid() {

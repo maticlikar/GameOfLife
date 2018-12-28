@@ -1,5 +1,5 @@
-let grid = new Grid(3);
-let updateTime = 1000; 
+let grid = new Grid(40);
+let updateTime = 100; 
 
 let game = new ConwayGameOfLife(grid, updateTime);
 

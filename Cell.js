@@ -9,7 +9,8 @@ class Cell {
     this.div.classList.add('cell');
     this.div.classList.add('dead');
 
-    this.div.addEventListener('click', this.toggleState);
+    // Adding all the event listeners
+    this.div.addEventListener('click', this.toggleState.bind(this));
     this.div.addEventListener('mouseover', function() {
       this.classList.add('mouseover');
     });
@@ -27,16 +28,54 @@ class Cell {
   }
 
   mooreNeighborhood() {
+    let row = this.row;
+    let col = this.col;
+    let neighbors = [];
 
+    if(row - 1 >= 0 && col - 1 >= 0) {
+      neighbors.push(this.grid.cells[row - 1][col - 1]);
+    }
+
+    if(row - 1 >= 0) {
+      neighbors.push(this.grid.cells[row - 1][col]);
+    }
+
+    if(row - 1 >= 0 && col + 1 < this.grid.totalSize) {
+      neighbors.push(this.grid.cells[row - 1][col + 1]);
+    }
+
+    if(col - 1 >= 0) {
+      neighbors.push(this.grid.cells[row][col - 1]);
+    }
+
+    if(col + 1 < this.grid.totalSize) {
+      neighbors.push(this.grid.cells[row][col + 1]);
+    }
+
+    if(row + 1 < this.grid.totalSize && col - 1 >= 0) {
+      neighbors.push(this.grid.cells[row + 1][col - 1]);
+    }
+
+    if(row + 1 < this.grid.totalSize) {
+      neighbors.push(this.grid.cells[row + 1][col]);
+    }
+
+    if(row + 1 < this.grid.totalSize && col + 1 < this.grid.totalSize) {
+      neighbors.push(this.grid.cells[row + 1][col + 1]);
+    }
+
+    return neighbors;
   }
 
   toggleState() {
-    if(this.classList.contains('alive')) {
-      this.classList.remove('alive');
-      this.classList.add('dead');
+    console.log(this.row + ' ' + this.col);
+
+    if(this.div.classList.contains('alive')) {
+      this.div.classList.remove('alive');
+      this.div.classList.add('dead');
     } else {
-      this.classList.remove('dead');
-      this.classList.add('alive');
+      this.div.classList.remove('dead');
+      this.div.classList.add('alive');
     }
   }
 }
