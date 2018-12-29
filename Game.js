@@ -6,14 +6,13 @@ class Game {
 
     this.startButton = document.querySelector('.start');
     this.startButton.addEventListener('click', this.togglePause.bind(this));
+
+    this.speedButton = document.querySelector('.submit_speed');
+    this.speedButton.addEventListener('click', this.changeUpdateTime.bind(this));
   }
 
-  start(interval, game) {
-    if(interval > 0) {
-      clearInterval(interval);
-    }
-
-    interval = setInterval('game.rules()', updateTime);
+  start() {
+    this.interval = setInterval('game.rules()', this.updateTime);
   }
   
   togglePause() {
@@ -27,10 +26,10 @@ class Game {
   }
 
   changeUpdateTime() {
-
-  }
-
-  getIsPaused() {
-    return this.isPaused;
+    this.updateTime = parseInt(document.querySelector('.speed_text').value);
+    
+    clearInterval(this.interval);
+    
+    this.start();
   }
 }

@@ -8,6 +8,9 @@ class Grid {
     this.width = this.div.parentElement.clientWidth;
     this.visible = true;
 
+    this.sizeButton = document.querySelector('.submit_size');
+    this.sizeButton.addEventListener('click', this.changeSize.bind(this));
+
     this.cells = this.populateCells();     
   }
 
@@ -62,6 +65,13 @@ class Grid {
   }
 
   changeSize() {
+    this.size = parseInt(document.querySelector('.size_text').value);
+    this.totalSize = this.size * 3;
+    
+    while (this.div.firstChild) {
+      this.div.removeChild(this.div.firstChild);
+    }
 
+    this.cells = this.populateCells();
   }
 }
