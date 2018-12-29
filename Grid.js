@@ -11,6 +11,9 @@ class Grid {
     this.sizeButton = document.querySelector('.submit_size');
     this.sizeButton.addEventListener('click', this.changeSize.bind(this));
 
+    this.toggleGridButton = document.querySelector('.toggle_grid');
+    this.toggleGridButton.addEventListener('click', this.toggleGrid.bind(this));
+
     this.cells = this.populateCells();     
   }
 
@@ -43,9 +46,11 @@ class Grid {
 
         if(this.visible) {
           // The '- 2' comes from the borders for each cell being 1px on each side
+          cell.div.style.border = '1px solid lightgray'; 
           cell.div.style.width = ((this.width / this.size) - 2).toString() + 'px';
           cell.div.style.height = ((this.height / this.size) - 2).toString() + 'px';
         } else {
+          cell.div.style.border = 'none'; 
           cell.div.style.width = ((this.width / this.size)).toString() + 'px';
           cell.div.style.height = ((this.height / this.size)).toString() + 'px';
         }
@@ -55,13 +60,27 @@ class Grid {
       }  
     }
 
-    console.log(cells);
-
     return cells;
   }
 
   toggleGrid() {
+    for (let i = this.size; i < 2 * this.size; i++) {
+      for (let j = this.size; j < 2 * this.size; j++) {
+        if(this.visible) {
+          this.cells[i][j].div.style.border = 'none'; 
 
+          this.cells[i][j].div.style.width = ((this.width/this.size)).toString() + 'px';
+          this.cells[i][j].div.style.height = ((this.height/this.size)).toString() + 'px';
+        } else { 
+          this.cells[i][j].div.style.border = '1px solid lightgray'; 
+
+          this.cells[i][j].div.style.width = ((this.width/this.size) - 2).toString() + 'px';
+          this.cells[i][j].div.style.height = ((this.height/this.size) - 2).toString() + 'px';
+        }
+      }
+    } 
+
+    this.visible = !this.visible;
   }
 
   changeSize() {
