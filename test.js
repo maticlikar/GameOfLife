@@ -1,6 +1,8 @@
-let grid = new Grid(5);
 let updateTime = 100; 
 
-let game = new ConwayGameOfLife(grid, updateTime);
+// Has to be named game
+let game = new ConwayGameOfLife(updateTime);
+
+let grid = new Grid(game, 30);
 
 game.start();

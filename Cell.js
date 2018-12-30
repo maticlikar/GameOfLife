@@ -1,6 +1,7 @@
 class Cell {
 
-  constructor(grid, row, col) {
+  constructor(game, grid, row, col) {
+    this.game = game;
     this.grid = grid;
     this.row = row;
     this.col = col;
@@ -67,8 +68,9 @@ class Cell {
     return neighbors;
   }
 
-  toggleState() {
-    console.log(this.row + ' ' + this.col);
+  toggleState(event) {
+    let row = event.target.id.split(' ')[0];
+    let col = event.target.id.split(' ')[1];
 
     if(this.div.classList.contains('alive')) {
       this.div.classList.remove('alive');
@@ -76,6 +78,18 @@ class Cell {
     } else {
       this.div.classList.remove('dead');
       this.div.classList.add('alive');
+
+      if(this.game.cellsToCheck.indexOf(this.grid.cells[row][col]) === -1) {
+        this.game.cellsToCheck.push(this.grid.cells[row][col]); 
+      }
+
+      let neighbors = this.mooreNeighborhood();
+
+      for (let i = 0; i < neighbors.length; i++) {
+        if(this.game.cellsToCheck.indexOf(neighbors[i]) === -1) {
+          this.game.cellsToCheck.push(neighbors[i]);
+        }
+      }
     }
   }
 }

@@ -1,6 +1,7 @@
 class Grid {
 
-  constructor(size) {
+  constructor(game, size) {
+    this.game = game;
     this.size = size;
     this.totalSize = size * 3;
     this.div = document.querySelector('.grid');
@@ -37,12 +38,14 @@ class Grid {
 
     for (let i = 0; i < this.totalSize; i++) {
       for (let j = 0; j < this.totalSize; j++) {
-        let cell = new Cell(this, i, j);        
+        let cell = new Cell(game, this, i, j);        
 
         // Only set the middle ones as visible
         if(!(i >= min && i <= max && j >= min && j <= max)) {
           cell.div.style.display = 'none';
         }
+
+        cell.div.id = i + ' ' + j;
 
         if(this.visible) {
           // The '- 2' comes from the borders for each cell being 1px on each side
@@ -86,6 +89,8 @@ class Grid {
   changeSize() {
     this.size = parseInt(document.querySelector('.size_text').value);
     this.totalSize = this.size * 3;
+
+    game.cellsToCheck = [];
     
     while (this.div.firstChild) {
       this.div.removeChild(this.div.firstChild);

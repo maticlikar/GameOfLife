@@ -3,6 +3,7 @@ class Game {
     this.updateTime = updateTime;
     this.interval = 0;
     this.isPaused = true;
+    this.cellsToCheck = [];
 
     this.startButton = document.querySelector('.start');
     this.startButton.addEventListener('click', this.togglePause.bind(this));
