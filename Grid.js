@@ -15,6 +15,12 @@ class Grid {
     this.toggleGridButton = document.querySelector('.toggle_grid');
     this.toggleGridButton.addEventListener('click', this.toggleGrid.bind(this));
 
+    this.presetButton = document.querySelector('.submit_preset');
+    this.presetButton.addEventListener('click', this.convertTextToGrid.bind(this));
+    
+    this.convertToTextButton = document.querySelector('.convert_to_text');
+    this.convertToTextButton.addEventListener('click', this.convertGridToText.bind(this));
+
     this.cells = this.populateCells();     
   }
 
@@ -23,7 +29,73 @@ class Grid {
   }
 
   convertTextToGrid() {
-    
+    let preset = document.querySelector('.preset_text').value.replace(/\s/g, "");
+
+    if (preset.charAt(0) >= '0' && preset.charAt(0) <= '9') {
+      let size = preset.split('[');
+      size = parseInt(size[0]);
+
+      document.querySelector('.size_text').value = size;
+
+      this.sizeButton.click(); 
+    }
+
+    // Converting from string to 2D array
+    preset = preset.split('[');
+    preset.splice(0, 2);
+    preset = preset.map(x => x.replace(/,/g, ''));
+    preset = preset.map(x => x.replace(/]/g, ''));
+    preset = preset.map(x => Array.from(x));
+    preset = preset.map(x => x.map(y => parseInt(y)));
+
+    if(preset.length > this.size) {
+      window.alert("The size of array given is larger than size of current game." +
+                   " Change the sizes to match each other.");
+      return;
+    }
+
+    // Filling the cell array
+    for (let i = 0; i < preset.length; i++) {
+      if(preset[i].length > this.size) {
+        window.alert("The size of array given is larger than size of current game." +
+                     " Change the sizes to match each other.");
+        return;
+      }
+
+      for (let j = 0; j < preset[i].length; j++) {
+
+        let r = i + this.size;
+        let c = j + this.size;
+
+        if(preset[i][j]) {
+          if(this.cells[r][c].div.classList.contains('dead')) {
+            this.cells[r][c].div.classList.remove('dead');
+            this.cells[r][c].div.classList.add('alive');
+
+            if(this.game.cellsToCheck.indexOf(this.cells[r][c]) === -1) {
+              this.game.cellsToCheck.push(this.cells[r][c]); 
+            }
+
+            let neighbors = this.cells[r][c].mooreNeighborhood();
+
+            if(game.constructor.name === 'ConwayGameOfLife') {
+              neighbors = this.cells[r][c].mooreNeighborhood();
+            }
+
+            for (let i = 0; i < neighbors.length; i++) {
+              if(this.game.cellsToCheck.indexOf(neighbors[i]) === -1) {
+                this.game.cellsToCheck.push(neighbors[i]);
+              }
+            }
+          }
+        } else {
+          if(this.cells[r][c].div.classList.contains('alive')) {
+            this.cells[r][c].div.classList.remove('alive');
+            this.cells[r][c].div.classList.add('dead');
+          }
+        }
+      } 
+    }
   }
 
   populateCells() {

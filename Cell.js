@@ -83,7 +83,9 @@ class Cell {
         this.game.cellsToCheck.push(this.grid.cells[row][col]); 
       }
 
-      let neighbors = this.mooreNeighborhood();
+
+      if(this.game.constructor.name === 'ConwayGameOfLife');
+        let neighbors = this.mooreNeighborhood();
 
       for (let i = 0; i < neighbors.length; i++) {
         if(this.game.cellsToCheck.indexOf(neighbors[i]) === -1) {
