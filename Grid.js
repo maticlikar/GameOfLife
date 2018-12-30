@@ -25,7 +25,37 @@ class Grid {
   }
 
   convertGridToText() {
+    let returnString = '';
 
+    returnString += this.size + '\n';
+
+    returnString += '[\n';
+    for (let i = this.size; i < 2 * this.size; i++) {
+      returnString += '['
+      for (let j = this.size; j < 2 * this.size - 1; j++) {
+        if(this.cells[i][j].div.classList.contains('alive')) {
+          returnString += '1, ';
+        } else {
+          returnString += '0, ';
+        }
+      } 
+
+      if(this.cells[i][2 * this.size - 1].div.classList.contains('alive')) {
+        returnString += '1';
+      } else {
+        returnString += '0';
+      }
+
+      if(i < 2 * this.size - 1) {
+        returnString += '],\n';
+      } else {
+        returnString += ']\n';
+      }
+    }
+
+    returnString += ']';
+
+    document.querySelector('.preset_text').value = returnString;
   }
 
   convertTextToGrid() {
