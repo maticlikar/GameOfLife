@@ -130,38 +130,37 @@ class Grid {
 
   populateCells() {
     let cells = [];
-
-    for (let i = 0; i < this.totalSize; i++) {
       cells[i] = [];
     }
-
-    let min = this.size;
-    let max = this.size + (this.size - 1);
 
     for (let i = 0; i < this.totalSize; i++) {
       for (let j = 0; j < this.totalSize; j++) {
         let cell = new Cell(game, this, i, j);        
 
         // Only set the middle ones as visible
-        if(!(i >= min && i <= max && j >= min && j <= max)) {
+        if(!(i >= this.size && i < this.size * 2 && j >= this.size && j < this.size * 2)) {
           cell.div.style.display = 'none';
         }
 
         cell.div.id = i + ' ' + j;
 
-        if(this.visible) {
-          // The '- 2' comes from the borders for each cell being 1px on each side
-          cell.div.style.border = '1px solid lightgray'; 
-          cell.div.style.width = ((this.width / this.size) - 2).toString() + 'px';
-          cell.div.style.height = ((this.height / this.size) - 2).toString() + 'px';
-        } else {
-          cell.div.style.border = 'none'; 
-          cell.div.style.width = ((this.width / this.size)).toString() + 'px';
-          cell.div.style.height = ((this.height / this.size)).toString() + 'px';
+        // Only set the width if it is visible on the screen
+        if(i >= this.size && i < this.size * 2 && j >= this.size && j < this.size * 2) {
+          if(this.visible) {
+            // The '- 2' comes from the borders for each cell being 1px on each side
+            cell.div.style.border = '1px solid lightgray'; 
+            cell.div.style.width = ((this.width / this.size) - 2).toString() + 'px';
+            cell.div.style.height = ((this.height / this.size) - 2).toString() + 'px';
+          } else {
+            cell.div.style.border = 'none'; 
+            cell.div.style.width = ((this.width / this.size)).toString() + 'px';
+            cell.div.style.height = ((this.height / this.size)).toString() + 'px';
+          }
+
+          this.div.appendChild(cell.div);
         }
 
         cells[i][j] = cell;
-        this.div.appendChild(cell.div);
       }  
     }
 
