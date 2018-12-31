@@ -130,6 +130,8 @@ class Grid {
 
   populateCells() {
     let cells = [];
+
+    for (let i = 0; i < this.totalSize; i++) {
       cells[i] = [];
     }
 
