@@ -22,6 +22,7 @@ class Grid {
     this.convertToTextButton.addEventListener('click', this.convertGridToText.bind(this));
 
     this.cells = this.populateCells();     
+    this.cellsToCheck = [];
   }
 
   convertGridToText() {
