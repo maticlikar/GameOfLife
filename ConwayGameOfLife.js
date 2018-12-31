@@ -7,7 +7,7 @@ const toggleGridButton = document.querySelector('.toggle_grid');
 const presetButton = document.querySelector('.submit_preset');
 const convertToTextButton = document.querySelector('.convert_to_text');
 
-let size = 40;
+let size = 50;
 let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
@@ -280,13 +280,15 @@ function createGrid(size, grid) {
         cell.style.display = 'none';
       }
 
-      // The '- 2' comes from the fact that the borders for each cell are 1px on each side
-      cell.style.width = ((initWidth/size) - 2).toString() + 'px';
-      cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+      if(i >= min && i <= max && j >= min && j <= max) {
+        // The '- 2' comes from the fact that the borders for each cell are 1px on each side
+        cell.style.width = ((initWidth/size) - 2).toString() + 'px';
+        cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+
+        grid.appendChild(cell);
+      }
 
       cells[i][j] = cell;
-
-      grid.appendChild(cell);
 
       cell.addEventListener('click', toggleCellState);
       cell.addEventListener('mouseover', function() {
