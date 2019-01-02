@@ -7,7 +7,7 @@ const toggleGridButton = document.querySelector('.toggle_grid');
 const presetButton = document.querySelector('.submit_preset');
 const convertToTextButton = document.querySelector('.convert_to_text');
 
-let size = 5;
+let size = 100;
 let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
@@ -41,7 +41,67 @@ function startGame() {
 
 function rules() {
   if(!isPaused) {
+    let kill = [];
+    let revive = [];
+    let dying = [];
+    let newCellsToCheck = [];
 
+    for (let i = 0; i < cellsToCheck.length; i++) {
+      let neighbors = getAllNeighbors(cellsToCheck[i]);
+      let aliveNeighbors = 0;
+
+      for (let k = 0; k < neighbors.length; k++) {
+        if(neighbors[k].classList.contains('alive')) {
+          aliveNeighbors++;
+        }
+      }
+
+      if(cellsToCheck[i].classList.contains('dead')) {
+        if(aliveNeighbors === 2) {
+          revive.push(cellsToCheck[i]);
+
+          if(newCellsToCheck.indexOf(cellsToCheck[i] === -1)) {
+            newCellsToCheck.push(cellsToCheck[i]); 
+          }
+
+          for (let i = 0; i < neighbors.length; i++) {
+            if(newCellsToCheck.indexOf(neighbors[i]) === -1) {
+              newCellsToCheck.push(neighbors[i]);
+            }
+          }
+        }
+      } else if(cellsToCheck[i].classList.contains('alive')) {
+        dying.push(cellsToCheck[i]);
+      } else {
+        kill.push(cellsToCheck[i]);
+      }
+
+      if(aliveNeighbors === 0) {
+        cellsToCheck.splice(i, 1);
+        i--;
+      }
+    }
+
+    for (let i = 0; i < newCellsToCheck.length; i++) {
+      if(cellsToCheck.indexOf(newCellsToCheck[i]) === -1) {
+        cellsToCheck.push(newCellsToCheck[i]);
+      }
+    }
+
+    for(let i = 0; i < kill.length; i++) {
+      kill[i].classList.remove('dying');
+      kill[i].classList.add('dead');
+    }
+
+    for(let i = 0; i < revive.length; i++) {
+      revive[i].classList.remove('dead');
+      revive[i].classList.add('alive');
+    }
+
+    for(let i = 0; i < dying.length; i++) {
+      dying[i].classList.remove('alive');
+      dying[i].classList.add('dying');
+    }
   }
 }
 
@@ -239,9 +299,16 @@ function createGrid(size, grid) {
       }
 
       if(i >= min && i <= max && j >= min && j <= max) {
-        // The '- 2' comes from the fact that the borders for each cell are 1px on each side
-        cell.style.width = ((initWidth/size) - 2).toString() + 'px';
-        cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+        if(isGrid) {
+          // The '-2' comes from the fact that the borders for each cell are 1px on each side
+          cell.style.width = ((initWidth/size) - 2).toString() + 'px';
+          cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+          cell.style.border = '1px solid lightgray';
+        } else {
+          cell.style.width = ((initWidth/size)).toString() + 'px';
+          cell.style.height = ((initHeight/size)).toString() + 'px';
+          cell.style.border = 'none';
+        }
 
         grid.appendChild(cell);
       }

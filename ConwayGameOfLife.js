@@ -56,12 +56,6 @@ function rules() {
         }
       }
 
-      if(cellsToCheck[i].classList.contains('alive')) {
-        if(aliveNeighbors < 2 || aliveNeighbors > 3) {
-          kill.push(cellsToCheck[i]);
-        }
-      }
-
       if(cellsToCheck[i].classList.contains('dead')) {
         if(aliveNeighbors === 3) {
           revive.push(cellsToCheck[i]);
@@ -75,6 +69,10 @@ function rules() {
               newCellsToCheck.push(neighbors[i]);
             }
           }
+        }
+      } else {
+        if(aliveNeighbors < 2 || aliveNeighbors > 3) {
+          kill.push(cellsToCheck[i]);
         }
       }
       
@@ -281,9 +279,16 @@ function createGrid(size, grid) {
       }
 
       if(i >= min && i <= max && j >= min && j <= max) {
-        // The '- 2' comes from the fact that the borders for each cell are 1px on each side
-        cell.style.width = ((initWidth/size) - 2).toString() + 'px';
-        cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+        if(isGrid) {
+          // The '-2' comes from the fact that the borders for each cell are 1px on each side
+          cell.style.width = ((initWidth/size) - 2).toString() + 'px';
+          cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+          cell.style.border = '1px solid lightgray';
+        } else {
+          cell.style.width = ((initWidth/size)).toString() + 'px';
+          cell.style.height = ((initHeight/size)).toString() + 'px';
+          cell.style.border = 'none';
+        }
 
         grid.appendChild(cell);
       }

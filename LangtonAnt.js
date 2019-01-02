@@ -321,9 +321,14 @@ function createGrid(size, grid) {
       }
 
       if(i >= min && i <= max && j >= min && j <= max) {
-        // The '- 2' comes from the fact that the borders for each cell are 1px on each side
-        cell.style.width = ((initWidth/size) - 2).toString() + 'px';
-        cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+        if(isGrid) {
+          // The '-2' comes from the fact that the borders for each cell are 1px on each side
+          cell.style.width = ((initWidth/size) - 2).toString() + 'px';
+          cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+        } else {
+          cell.style.width = ((initWidth/size)).toString() + 'px';
+          cell.style.height = ((initHeight/size)).toString() + 'px';
+        }
 
         grid.appendChild(cell);
       }
