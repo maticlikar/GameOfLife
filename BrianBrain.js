@@ -7,7 +7,7 @@ const toggleGridButton = document.querySelector('.toggle_grid');
 const presetButton = document.querySelector('.submit_preset');
 const convertToTextButton = document.querySelector('.convert_to_text');
 
-let size = 50;
+let size = 100;
 let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
@@ -17,12 +17,8 @@ let myInterval = 0;
 let isPaused = true;
 let isGrid = true;
 
-let ant = null;
-
 let cells = createGrid(size, grid);
-
-// 0 = N, 1 = E, 2 = S, 3 = W
-var direction = 0;
+let cellsToCheck = [];
 
 startButton.addEventListener('click', togglePause);
 speedButton.addEventListener('click', changeUpdateTime);
@@ -45,61 +41,68 @@ function startGame() {
 
 function rules() {
   if(!isPaused) {
-    if(ant.parentNode.classList.contains('alive')) {
-      ant.click();
+    let kill = [];
+    let revive = [];
+    let dying = [];
+    let newCellsToCheck = [];
 
-      if(direction === 3) {
-        direction = 0;
-      } else {
-        direction++;
+    for (let i = 0; i < cellsToCheck.length; i++) {
+      let neighbors = getAllNeighbors(cellsToCheck[i]);
+      let aliveNeighbors = 0;
+
+      for (let k = 0; k < neighbors.length; k++) {
+        if(neighbors[k].classList.contains('alive')) {
+          aliveNeighbors++;
+        }
       }
-    } else if(ant.parentNode.classList.contains('dead')) {
-      ant.click();
 
-      if(direction === 0) {
-        direction = 3;
+      if(cellsToCheck[i].classList.contains('dead')) {
+        if(aliveNeighbors === 2) {
+          revive.push(cellsToCheck[i]);
+
+          if(newCellsToCheck.indexOf(cellsToCheck[i] === -1)) {
+            newCellsToCheck.push(cellsToCheck[i]); 
+          }
+
+          for (let i = 0; i < neighbors.length; i++) {
+            if(newCellsToCheck.indexOf(neighbors[i]) === -1) {
+              newCellsToCheck.push(neighbors[i]);
+            }
+          }
+        }
+      } else if(cellsToCheck[i].classList.contains('alive')) {
+        dying.push(cellsToCheck[i]);
       } else {
-        direction--;
+        kill.push(cellsToCheck[i]);
+      }
+
+      if(aliveNeighbors === 0) {
+        cellsToCheck.splice(i, 1);
+        i--;
       }
     }
 
-    let cell = getNextCell(direction);   
-
-    ant.remove();
-    ant = document.createElement('DIV'); 
-    ant.classList.add('ant');
-
-    ant.style.width = cell.style.width;
-    ant.style.height = cell.style.width;
-
-    cell.appendChild(ant);
-  }
-}
-
-function getNextCell(direction) {
-  let rowCol = ant.parentNode.id.split(' ').map(x => parseInt(x));
-  let row = rowCol[0];
-  let col = rowCol[1];
-
-  if(direction === 0) {
-    if(col - 1 >= 0) {
-      return cells[row][col - 1];
+    for (let i = 0; i < newCellsToCheck.length; i++) {
+      if(cellsToCheck.indexOf(newCellsToCheck[i]) === -1) {
+        cellsToCheck.push(newCellsToCheck[i]);
+      }
     }
-  } else if(direction === 1) {
-    if(row + 1 < cells.length) {
-      return cells[row + 1][col];
+
+    for(let i = 0; i < kill.length; i++) {
+      kill[i].classList.remove('dying');
+      kill[i].classList.add('dead');
     }
-  } else if(direction === 2) {
-    if(col + 1 < cells.length) {
-      return cells[row][col + 1];
+
+    for(let i = 0; i < revive.length; i++) {
+      revive[i].classList.remove('dead');
+      revive[i].classList.add('alive');
     }
-  } else if(direction === 3) {
-    if(row - 1 >= 0) {
-      return cells[row - 1][col];
+
+    for(let i = 0; i < dying.length; i++) {
+      dying[i].classList.remove('alive');
+      dying[i].classList.add('dying');
     }
   }
-
-  return cells[row][col];
 }
 
 function togglePause() {
@@ -157,7 +160,6 @@ function toggleGrid() {
 
 function convertTextToGrid() {
   let preset = document.querySelector('.preset_text').value.replace(/\s/g, "");
-  let isAnt = false;
 
   if (preset.charAt(0) >= '0' && preset.charAt(0) <= '9') {
     let size = preset.split('[');
@@ -199,33 +201,38 @@ function convertTextToGrid() {
         if(cells[r][c].classList.contains('alive')) {
           cells[r][c].classList.remove('alive');
           cells[r][c].classList.add('dead');
-        } else if(cells[r][c].classList.contains('ant')) {
-          cells[r][c].classList.remove('ant');
+        } else if(cells[r][c].classList.contains('dying')) {
+          cells[r][c].classList.remove('dying');
           cells[r][c].classList.add('dead');
         }
       } else if(preset[i][j] === 1) {
         if(cells[r][c].classList.contains('dead')) {
           cells[r][c].classList.remove('dead');
           cells[r][c].classList.add('alive');
-        } else if(cells[r][c].classList.contains('ant')) {
-          cells[r][c].classList.remove('ant');
+        } else if(cells[r][c].classList.contains('dying')) {
+          cells[r][c].classList.remove('dying');
           cells[r][c].classList.add('alive');
         }
-      } else {
-        isAnt = true;
 
-        if(cells[r][c].classList.contains('dead')) {
-          cells[r][c].classList.remove('dead');
-          cells[r][c].classList.add('ant');
-        } else if(cells[r][c].classList.contains('alive')) {
-          cells[r][c].classList.remove('alive');
-          cells[r][c].classList.add('ant');
+        if(cellsToCheck.indexOf(cells[r][c]) === -1) {
+          cellsToCheck.push(cells[r][c]); 
         }
 
-        ant.classList.remove('ant');
-        ant.classList.add('dead');
+        let neighbors = getAllNeighbors(cells[r][c]);
 
-        ant = cells[r][c];
+        for (let i = 0; i < neighbors.length; i++) {
+          if(cellsToCheck.indexOf(neighbors[i]) === -1) {
+            cellsToCheck.push(neighbors[i]);
+          }
+        }
+      } else {
+        if(cells[r][c].classList.contains('alive')) {
+          cells[r][c].classList.remove('alive');
+          cells[r][c].classList.add('dying');
+        } else if(cells[r][c].classList.contains('dead')) {
+          cells[r][c].classList.remove('dead');
+          cells[r][c].classList.add('dying');
+        }
       }
     } 
   }
@@ -241,49 +248,20 @@ function convertGridToText() {
     returnString += '['
     for (let j = size; j < 2 * size - 1; j++) {
       if(cells[i][j].classList.contains('alive')) {
-        if(cells[i][j].firstChild !== null) {
-          if(cells[i][j].firstChild.classList.contains('ant')) {
-            returnString += '2, ';
-          } else {
-            returnString += '1, ';
-          }
-        } else {
-          returnString += '1, ';
-        }
+        returnString += '1, ';
       } else if(cells[i][j].classList.contains('dead')) {
-        if(cells[i][j].firstChild !== null) {
-          if(cells[i][j].firstChild.classList.contains('ant')) {
-            returnString += '2, ';
-          } else {
-            returnString += '0, ';
-          }
-        } else {
-          returnString += '0, ';
-        }
+        returnString += '0, ';
+      } else {
+        returnString += '2, ';
       }
     } 
 
     if(cells[i][2 * size - 1].classList.contains('alive')) {
-      if(cells[i][2 * size - 1].firstChild !== null) {
-        if(cells[i][2 * size - 1].firstChild.classList.contains('ant')) {
-          returnString += '2';
-        } else {
-          returnString += '1';
-        }
-      } else {
-        returnString += '1';
-      }
+      returnString += '1';
     } else if(cells[i][2 * size - 1].classList.contains('dead')) {
-      if(cells[i][2 * size - 1].firstChild !== null) {
-        if(cells[i][2 * size - 1].firstChild.classList.contains('ant')) {
-          returnString += '2';
-        } else {
-          returnString += '0';
-        }
-      } else {
-        returnString += '0';
-      }
-     
+      returnString += '0';
+    } else {
+      returnString += '2';
     }
 
     if(i < 2 * size - 1) {
@@ -325,9 +303,11 @@ function createGrid(size, grid) {
           // The '-2' comes from the fact that the borders for each cell are 1px on each side
           cell.style.width = ((initWidth/size) - 2).toString() + 'px';
           cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+          cell.style.border = '1px solid lightgray';
         } else {
           cell.style.width = ((initWidth/size)).toString() + 'px';
           cell.style.height = ((initHeight/size)).toString() + 'px';
+          cell.style.border = 'none';
         }
 
         grid.appendChild(cell);
@@ -336,8 +316,6 @@ function createGrid(size, grid) {
       cells[i][j] = cell;
 
       cell.addEventListener('click', toggleCellState);
-      cell.addEventListener('dblclick', positionAnt);
-
       cell.addEventListener('mouseover', function() {
 
         if(this.classList.contains('dead')) {
@@ -354,36 +332,89 @@ function createGrid(size, grid) {
     } 
   }
 
-  let mid = Math.floor(totalSize / 2);
-
-  ant = document.createElement('DIV');
-  ant.classList.add('ant');
-  ant.style.width = cells[mid][mid].style.width;
-  ant.style.height = cells[mid][mid].style.width;
-  cells[mid][mid].appendChild(ant);
-
-  direction = 0;
-
   return cells;
-}
-
-function positionAnt() {
-  ant.remove();
-  ant = document.createElement('DIV'); 
-  ant.classList.add('ant');
-
-  ant.style.width = this.style.width;
-  ant.style.height = this.style.width;
-
-  this.appendChild(ant);
 }
 
 function toggleCellState() {
   if(this.classList.contains('alive')) {
     this.classList.remove('alive');
-    this.classList.add('dead');
+    this.classList.add('dying');
   } else if(this.classList.contains('dead')) {
     this.classList.remove('dead');
     this.classList.add('alive');
+
+    if(cellsToCheck.indexOf(this) === -1) {
+      cellsToCheck.push(this); 
+    }
+
+    let neighbors = getAllNeighbors(this);
+
+    for (let i = 0; i < neighbors.length; i++) {
+      if(cellsToCheck.indexOf(neighbors[i]) === -1) {
+        cellsToCheck.push(neighbors[i]);
+      }
+    }
+  } else {
+    this.classList.remove('dying');
+    this.classList.add('dead');
   }
 }
+
+function getAllNeighbors(cell) {
+  let neighbors = [];
+
+  let rowAndCol = cell.id.split(' ');
+  let i = parseInt(rowAndCol[0]);
+  let j = parseInt(rowAndCol[1]);
+
+  if(i - 1 >= 0 && j - 1 >= 0) {
+    let cell = cells[i - 1][j - 1];
+
+    neighbors.push(cell);
+  }
+
+  if(i - 1 >= 0) {
+    let cell = cells[i - 1][j];
+
+    neighbors.push(cell);
+  }
+
+  if(i - 1 >= 0 && j + 1 < totalSize) {
+    let cell = cells[i - 1][j + 1];
+
+    neighbors.push(cell);
+  }
+
+  if(j - 1 >= 0) {
+    let cell = cells[i][j - 1];
+
+    neighbors.push(cell);
+  }
+
+  if(j + 1 < totalSize) {
+    let cell = cells[i][j + 1];
+
+    neighbors.push(cell);
+  }
+
+  if(i + 1 < totalSize && j - 1 >= 0) {
+    let cell = cells[i + 1][j - 1];
+
+    neighbors.push(cell);
+  }
+
+  if(i + 1 < totalSize) {
+    let cell = cells[i + 1][j];
+
+    neighbors.push(cell);
+  }
+
+  if(i + 1 < totalSize && j + 1 < totalSize) {
+    let cell = cells[i + 1][j + 1];
+
+    neighbors.push(cell);
+  }
+
+  return neighbors;
+}
+

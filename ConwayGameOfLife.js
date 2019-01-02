@@ -1,101 +1,397 @@
-class ConwayGameOfLife {
-  constructor(updateTime) {
-    this.updateTime = updateTime;
-    this.interval = 0;
-    this.isPaused = true;
-    this.cellsToCheck = [];
+const grid = document.querySelector('.grid');
+const container = document.querySelector('.container');
+const startButton = document.querySelector('.start');
+const speedButton = document.querySelector('.submit_speed');
+const sizeButton = document.querySelector('.submit_size');
+const toggleGridButton = document.querySelector('.toggle_grid');
+const presetButton = document.querySelector('.submit_preset');
+const convertToTextButton = document.querySelector('.convert_to_text');
 
-    this.startButton = document.querySelector('.start');
-    this.startButton.addEventListener('click', this.togglePause.bind(this));
+let size = 50;
+let totalSize = size * 3;
+const initHeight = container.clientHeight;
+const initWidth = container.clientWidth;
 
-    this.speedButton = document.querySelector('.submit_speed');
-    this.speedButton.addEventListener('click', this.changeUpdateTime.bind(this));
+let updateTime = 500; // In milliseconds
+let myInterval = 0;
+let isPaused = true;
+let isGrid = true;
+
+let cells = createGrid(size, grid);
+let cellsToCheck = [];
+
+startButton.addEventListener('click', togglePause);
+speedButton.addEventListener('click', changeUpdateTime);
+sizeButton.addEventListener('click', changeSize);
+toggleGridButton.addEventListener('click', toggleGrid);
+presetButton.addEventListener('click', convertTextToGrid);
+convertToTextButton.addEventListener('click', convertGridToText);
+
+startGame();
+
+/* Start of Functions */
+
+function startGame() {
+  if(myInterval > 0) {
+    clearInterval(myInterval);
   }
 
-  start() {
-    this.interval = setInterval( () => this.rules(), this.updateTime);
+  myInterval = setInterval('rules()', updateTime);
+}
+
+function rules() {
+  if(!isPaused) {
+
+    let kill = [];
+    let revive = [];
+    let newCellsToCheck = [];
+
+    for (let i = 0; i < cellsToCheck.length; i++) {
+      let neighbors = getAllNeighbors(cellsToCheck[i]);
+      let aliveNeighbors = 0;
+
+      for (let k = 0; k < neighbors.length; k++) {
+        if(neighbors[k].classList.contains('alive')) {
+          aliveNeighbors++;
+        }
+      }
+
+      if(cellsToCheck[i].classList.contains('dead')) {
+        if(aliveNeighbors === 3) {
+          revive.push(cellsToCheck[i]);
+
+          if(newCellsToCheck.indexOf(cellsToCheck[i] === -1)) {
+            newCellsToCheck.push(cellsToCheck[i]); 
+          }
+
+          for (let i = 0; i < neighbors.length; i++) {
+            if(newCellsToCheck.indexOf(neighbors[i]) === -1) {
+              newCellsToCheck.push(neighbors[i]);
+            }
+          }
+        }
+      } else {
+        if(aliveNeighbors < 2 || aliveNeighbors > 3) {
+          kill.push(cellsToCheck[i]);
+        }
+      }
+      
+      // Don't need to check it if it doesn't have any neighbors anymore
+      
+      if(aliveNeighbors === 0) {
+        cellsToCheck.splice(i, 1);
+        i--;
+      }
+      
+    }
+
+    for (let i = 0; i < newCellsToCheck.length; i++) {
+      if(cellsToCheck.indexOf(newCellsToCheck[i]) === -1) {
+        cellsToCheck.push(newCellsToCheck[i]);
+      }
+    }
+
+    for(let i = 0; i < kill.length; i++) {
+      kill[i].classList.remove('alive');
+      kill[i].classList.add('dead');
+    }
+
+    for(let i = 0; i < revive.length; i++) {
+      revive[i].classList.remove('dead');
+      revive[i].classList.add('alive');
+    }
   }
+}
+
+function togglePause() {
+  isPaused = !isPaused;
+
+  if(isPaused) {
+    startButton.innerText = 'Start';
+  } else {
+    startButton.innerText = 'Pause';
+  }
+}
+
+function changeUpdateTime() {
+  updateTime = parseInt(document.querySelector('.speed_text').value);
   
-  togglePause() {
-    this.isPaused = !this.isPaused;
+  clearInterval(myInterval);
+  
+  startGame();
+}
 
-    if(this.isPaused) {
-      this.startButton.innerText = 'Start';
+function changeSize() {
+  size = parseInt(document.querySelector('.size_text').value);
+  totalSize = size * 3;
+
+  cellsToCheck = [];
+  
+  while (grid.firstChild) {
+    grid.removeChild(grid.firstChild);
+  }
+
+  cells = createGrid(size, grid);
+
+  startGame();
+}
+
+function toggleGrid() {
+  for (let i = size; i < 2 * size; i++) {
+    for (let j = size; j < 2 * size; j++) {
+      if(isGrid) {
+        cells[i][j].style.border = 'none'; 
+
+        cells[i][j].style.width = ((initWidth/size)).toString() + 'px';
+        cells[i][j].style.height = ((initHeight/size)).toString() + 'px';
+      } else { 
+        cells[i][j].style.border = '1px solid lightgray'; 
+
+        cells[i][j].style.width = ((initWidth/size) - 2).toString() + 'px';
+        cells[i][j].style.height = ((initHeight/size) - 2).toString() + 'px';
+      }
+    }
+  } 
+
+  isGrid = !isGrid;
+}
+
+function convertTextToGrid() {
+  let preset = document.querySelector('.preset_text').value.replace(/\s/g, "");
+
+  if (preset.charAt(0) >= '0' && preset.charAt(0) <= '9') {
+    let size = preset.split('[');
+    size = parseInt(size[0]);
+
+    document.querySelector('.size_text').value = size;
+
+    sizeButton.click(); 
+  }
+
+  // Converting from string to 2D array
+  preset = preset.split('[');
+  preset.splice(0, 2);
+  preset = preset.map(x => x.replace(/,/g, ''));
+  preset = preset.map(x => x.replace(/]/g, ''));
+  preset = preset.map(x => Array.from(x));
+  preset = preset.map(x => x.map(y => parseInt(y)));
+
+  if(preset.length > size) {
+    window.alert("The size of array given is larger than size of current game." +
+                 " Change the sizes to match each other.");
+    return;
+  }
+
+  // Filling the cell array
+  for (let i = 0; i < preset.length; i++) {
+    if(preset[i].length > size) {
+      window.alert("The size of array given is larger than size of current game." +
+                   " Change the sizes to match each other.");
+      return;
+    }
+
+    for (let j = 0; j < preset[i].length; j++) {
+
+      let r = i + size;
+      let c = j + size;
+
+      if(preset[i][j]) {
+        if(cells[r][c].classList.contains('dead')) {
+          cells[r][c].classList.remove('dead');
+          cells[r][c].classList.add('alive');
+
+          if(cellsToCheck.indexOf(cells[r][c]) === -1) {
+            cellsToCheck.push(cells[r][c]); 
+          }
+
+          let neighbors = getAllNeighbors(cells[r][c]);
+
+          for (let i = 0; i < neighbors.length; i++) {
+            if(cellsToCheck.indexOf(neighbors[i]) === -1) {
+              cellsToCheck.push(neighbors[i]);
+            }
+          }
+        }
+      } else {
+        if(cells[r][c].classList.contains('alive')) {
+          cells[r][c].classList.remove('alive');
+          cells[r][c].classList.add('dead');
+        }
+      }
+    } 
+  }
+}
+
+function convertGridToText() {
+  let returnString = '';
+
+  returnString += size + '\n';
+
+  returnString += '[\n';
+  for (let i = size; i < 2 * size; i++) {
+    returnString += '['
+    for (let j = size; j < 2 * size - 1; j++) {
+      if(cells[i][j].classList.contains('alive')) {
+        returnString += '1, ';
+      } else {
+        returnString += '0, ';
+      }
+    } 
+
+    if(cells[i][2 * size - 1].classList.contains('alive')) {
+      returnString += '1';
     } else {
-      this.startButton.innerText = 'Pause';
+      returnString += '0';
+    }
+
+    if(i < 2 * size - 1) {
+      returnString += '],\n';
+    } else {
+      returnString += ']\n';
     }
   }
 
-  changeUpdateTime() {
-    this.updateTime = parseInt(document.querySelector('.speed_text').value);
-    
-    clearInterval(this.interval);
-    
-    this.start();
+  returnString += ']';
+
+  document.querySelector('.preset_text').value = returnString;
+}
+
+function createGrid(size, grid) {
+  let cells = [];
+
+  for (let i = 0; i < totalSize; i++) {
+    cells[i] = [];
   }
 
-  rules() {
-    if(!this.isPaused) {
-      let kill = [];
-      let revive = [];
-      let newCellsToCheck = [];
+  let min = size;
+  let max = size + (size - 1);
 
-      for (let i = 0; i < this.cellsToCheck.length; i++) {
-        let cell = this.cellsToCheck[i];
-        let neighbors = cell.mooreNeighborhood();
-        let aliveNeighbors = 0;
+  for (let i = 0; i < totalSize; i++) {
+    for (let j = 0; j < totalSize; j++) {
+      let cell = document.createElement('DIV'); 
+      cell.classList.add('cell');
+      cell.classList.add('dead');
+      cell.id = i + " " + j;
 
-        for (let k = 0; k < neighbors.length; k++) {
-          if(neighbors[k].div.classList.contains('alive')) {
-            aliveNeighbors++;
-          }
+      // Only set the middle ones as visible
+      if(!(i >= min && i <= max && j >= min && j <= max)) {
+        cell.style.display = 'none';
+      }
+
+      if(i >= min && i <= max && j >= min && j <= max) {
+        if(isGrid) {
+          // The '-2' comes from the fact that the borders for each cell are 1px on each side
+          cell.style.width = ((initWidth/size) - 2).toString() + 'px';
+          cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+          cell.style.border = '1px solid lightgray';
+        } else {
+          cell.style.width = ((initWidth/size)).toString() + 'px';
+          cell.style.height = ((initHeight/size)).toString() + 'px';
+          cell.style.border = 'none';
         }
+
+        grid.appendChild(cell);
+      }
+
+      cells[i][j] = cell;
+
+      cell.addEventListener('click', toggleCellState);
+      cell.addEventListener('mouseover', function() {
+
+        if(this.classList.contains('dead')) {
+          this.classList.add('mouseover');
+        }
+      });
+
+      cell.addEventListener('mouseout', function() {
         
-        if(cell.div.classList.contains('alive')) {
-          if(aliveNeighbors < 2 || aliveNeighbors > 3) {
-            kill.push(cell);
-          }
+        if(this.classList.contains('mouseover')) {
+          this.classList.remove('mouseover');
         }
+      });
+    } 
+  }
 
-        if(cell.div.classList.contains('dead')) {
-          if(aliveNeighbors === 3) {
-            revive.push(cell);
+  return cells;
+}
 
-            if(newCellsToCheck.indexOf(cell === -1)) {
-              newCellsToCheck.push(cell);
-            }
+function toggleCellState() {
+  if(this.classList.contains('alive')) {
+    this.classList.remove('alive');
+    this.classList.add('dead');
+  } else {
+    this.classList.remove('dead');
+    this.classList.add('alive');
 
-            for (let i = 0; i < neighbors.length; i++) {
-              if(newCellsToCheck.indexOf(neighbors[i]) === -1) {
-                newCellsToCheck.push(neighbors[i]);
-              }
-            }
-          }
-        }
+    if(cellsToCheck.indexOf(this) === -1) {
+      cellsToCheck.push(this); 
+    }
 
-        // Don't need to check it if it doesn't have any neighbors anymore
-        
-        if(aliveNeighbors === 0) {
-          this.cellsToCheck.splice(i, 1);
-          i--;
-        }
-      }
+    let neighbors = getAllNeighbors(this);
 
-      for (let i = 0; i < newCellsToCheck.length; i++) {
-        if(this.cellsToCheck.indexOf(newCellsToCheck[i]) === -1) {
-          this.cellsToCheck.push(newCellsToCheck[i]);
-        }
-      }
-
-      for(let i = 0; i < kill.length; i++) {
-        kill[i].div.classList.remove('alive');
-        kill[i].div.classList.add('dead');
-      }
-
-      for(let i = 0; i < revive.length; i++) {
-        revive[i].div.classList.remove('dead');
-        revive[i].div.classList.add('alive');
+    for (let i = 0; i < neighbors.length; i++) {
+      if(cellsToCheck.indexOf(neighbors[i]) === -1) {
+        cellsToCheck.push(neighbors[i]);
       }
     }
   }
 }
+
+function getAllNeighbors(cell) {
+  let neighbors = [];
+
+  let rowAndCol = cell.id.split(' ');
+  let i = parseInt(rowAndCol[0]);
+  let j = parseInt(rowAndCol[1]);
+
+  if(i - 1 >= 0 && j - 1 >= 0) {
+    let cell = cells[i - 1][j - 1];
+
+    neighbors.push(cell);
+  }
+
+  if(i - 1 >= 0) {
+    let cell = cells[i - 1][j];
+
+    neighbors.push(cell);
+  }
+
+  if(i - 1 >= 0 && j + 1 < totalSize) {
+    let cell = cells[i - 1][j + 1];
+
+    neighbors.push(cell);
+  }
+
+  if(j - 1 >= 0) {
+    let cell = cells[i][j - 1];
+
+    neighbors.push(cell);
+  }
+
+  if(j + 1 < totalSize) {
+    let cell = cells[i][j + 1];
+
+    neighbors.push(cell);
+  }
+
+  if(i + 1 < totalSize && j - 1 >= 0) {
+    let cell = cells[i + 1][j - 1];
+
+    neighbors.push(cell);
+  }
+
+  if(i + 1 < totalSize) {
+    let cell = cells[i + 1][j];
+
+    neighbors.push(cell);
+  }
+
+  if(i + 1 < totalSize && j + 1 < totalSize) {
+    let cell = cells[i + 1][j + 1];
+
+    neighbors.push(cell);
+  }
+
+  return neighbors;
+}
+
