@@ -8,7 +8,6 @@ const presetButton = document.querySelector('.submit_preset');
 const convertToTextButton = document.querySelector('.convert_to_text');
 
 let size = 50;
-let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
 
@@ -19,8 +18,7 @@ let isGrid = true;
 
 let cells = createGrid(size, grid);
 
-// TODO: Change to 0
-var currentRow = size;
+var currentRow = 0;
 
 startButton.addEventListener('click', togglePause);
 speedButton.addEventListener('click', changeUpdateTime);
@@ -45,13 +43,12 @@ function rules() {
   //console.log(currentRow);
   if(!isPaused) {
 
-    for (let i = size; i < size * 2; i++) {
+    for (let i = 0; i < size; i++) {
       // fc = first cell
       let fc = null;
      
       if(i - 1 < 0) {
-        fc = cells[currentRow][size * 2 - 1];
-        //fc = cells[currentRow][size - 1];
+        fc = cells[currentRow][size - 1];
       } else {
         fc = cells[currentRow][i - 1];
       }
@@ -62,9 +59,8 @@ function rules() {
       // tc = third cell
       let tc = null;
 
-      if(i + 1 > size * 2 - 1) {
-        tc = cells[currentRow][size];
-        //tc = cells[currentRow][0];
+      if(i + 1 > size - 1) {
+        tc = cells[currentRow][0];
       } else {
         tc = cells[currentRow][i + 1];
       }
@@ -129,7 +125,6 @@ function changeUpdateTime() {
 
 function changeSize() {
   size = parseInt(document.querySelector('.size_text').value);
-  totalSize = size * 3;
 
   while (grid.firstChild) {
     grid.removeChild(grid.firstChild);
@@ -137,15 +132,14 @@ function changeSize() {
 
   cells = createGrid(size, grid);
   
-  //TODO: Change to 0
-  currentRow = size;
+  currentRow = 0;
 
   startGame();
 }
 
 function toggleGrid() {
-  for (let i = size; i < 2 * size; i++) {
-    for (let j = size; j < 2 * size; j++) {
+  for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
       if(isGrid) {
         cells[i][j].style.border = 'none'; 
 
@@ -266,39 +260,29 @@ function convertGridToText() {
 function createGrid(size, grid) {
   let cells = [];
 
-  for (let i = 0; i < totalSize; i++) {
+  for (let i = 0; i < size; i++) {
     cells[i] = [];
   }
 
-  let min = size;
-  let max = size + (size - 1);
-
-  for (let i = 0; i < totalSize; i++) {
-    for (let j = 0; j < totalSize; j++) {
+  for (let i = 0; i < size; i++) {
+    for (let j = 0; j < size; j++) {
       let cell = document.createElement('DIV'); 
       cell.classList.add('cell');
       cell.classList.add('dead');
       cell.id = i + " " + j;
 
-      // Only set the middle ones as visible
-      if(!(i >= min && i <= max && j >= min && j <= max)) {
-        cell.style.display = 'none';
+      if(isGrid) {
+        // The '-2' comes from the fact that the borders for each cell are 1px on each side
+        cell.style.width = ((initWidth/size) - 2).toString() + 'px';
+        cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+        cell.style.border = '1px solid lightgray';
+      } else {
+        cell.style.width = ((initWidth/size)).toString() + 'px';
+        cell.style.height = ((initHeight/size)).toString() + 'px';
+        cell.style.border = 'none';
       }
 
-      if(i >= min && i <= max && j >= min && j <= max) {
-        if(isGrid) {
-          // The '-2' comes from the fact that the borders for each cell are 1px on each side
-          cell.style.width = ((initWidth/size) - 2).toString() + 'px';
-          cell.style.height = ((initHeight/size) - 2).toString() + 'px';
-          cell.style.border = '1px solid lightgray';
-        } else {
-          cell.style.width = ((initWidth/size)).toString() + 'px';
-          cell.style.height = ((initHeight/size)).toString() + 'px';
-          cell.style.border = 'none';
-        }
-
-        grid.appendChild(cell);
-      }
+      grid.appendChild(cell);
 
       cells[i][j] = cell;
 
