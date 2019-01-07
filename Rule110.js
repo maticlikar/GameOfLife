@@ -7,7 +7,7 @@ const toggleGridButton = document.querySelector('.toggle_grid');
 const presetButton = document.querySelector('.submit_preset');
 const convertToTextButton = document.querySelector('.convert_to_text');
 
-let size = 100;
+let size = 50;
 let totalSize = size * 3;
 const initHeight = container.clientHeight;
 const initWidth = container.clientWidth;
@@ -18,7 +18,9 @@ let isPaused = true;
 let isGrid = true;
 
 let cells = createGrid(size, grid);
-let cellsToCheck = [];
+
+// TODO: Change to 0
+var currentRow = size;
 
 startButton.addEventListener('click', togglePause);
 speedButton.addEventListener('click', changeUpdateTime);
@@ -40,70 +42,70 @@ function startGame() {
 }
 
 function rules() {
-  console.log(cellsToCheck);
+  //console.log(currentRow);
   if(!isPaused) {
-    let kill = [];
-    let revive = [];
-    let dying = [];
-    let newCellsToCheck = [];
 
-    for (let i = 0; i < cellsToCheck.length; i++) {
-      let neighbors = getAllNeighbors(cellsToCheck[i]);
-      let aliveNeighbors = 0;
-
-      for (let k = 0; k < neighbors.length; k++) {
-        if(neighbors[k].classList.contains('alive')) {
-          aliveNeighbors++;
-        }
-      }
-
-      if(cellsToCheck[i].classList.contains('dead')) {
-        if(aliveNeighbors === 2) {
-          revive.push(cellsToCheck[i]);
-
-          if(newCellsToCheck.indexOf(cellsToCheck[i] === -1)) {
-            newCellsToCheck.push(cellsToCheck[i]); 
-          }
-
-          for (let i = 0; i < neighbors.length; i++) {
-            if(newCellsToCheck.indexOf(neighbors[i]) === -1) {
-              newCellsToCheck.push(neighbors[i]);
-            }
-          }
-        }
-      } else if(cellsToCheck[i].classList.contains('alive')) {
-        dying.push(cellsToCheck[i]);
+    for (let i = size; i < size * 2; i++) {
+      // fc = first cell
+      let fc = null;
+     
+      if(i - 1 < 0) {
+        fc = cells[currentRow][size * 2 - 1];
+        //fc = cells[currentRow][size - 1];
       } else {
-        console.log('h');
-        kill.push(cellsToCheck[i]);
+        fc = cells[currentRow][i - 1];
+      }
+     
+      // sc = second cell
+      let sc = cells[currentRow][i];
+
+      // tc = third cell
+      let tc = null;
+
+      if(i + 1 > size * 2 - 1) {
+        tc = cells[currentRow][size];
+        //tc = cells[currentRow][0];
+      } else {
+        tc = cells[currentRow][i + 1];
       }
 
-      if(aliveNeighbors === 0 && cellsToCheck[i].classList.contains('dead')) {
-        cellsToCheck.splice(i, 1);
-        i--;
+      if(fc.classList.contains('alive')) {
+        if(sc.classList.contains('alive')) {
+          if(tc.classList.contains('alive')) {
+            // Keep it dead
+          } else {
+            cells[currentRow + 1][i].classList.remove('dead');
+            cells[currentRow + 1][i].classList.add('alive');
+          }
+        } else {
+          if(tc.classList.contains('alive')) {
+            cells[currentRow + 1][i].classList.remove('dead');
+            cells[currentRow + 1][i].classList.add('alive');
+          } else {
+            // Keep it dead
+          }
+        }
+      } else {
+        if(sc.classList.contains('alive')) {
+          if(tc.classList.contains('alive')) {
+            cells[currentRow + 1][i].classList.remove('dead');
+            cells[currentRow + 1][i].classList.add('alive');
+          } else {
+            cells[currentRow + 1][i].classList.remove('dead');
+            cells[currentRow + 1][i].classList.add('alive');
+          }
+        } else {
+          if(tc.classList.contains('alive')) {
+            cells[currentRow + 1][i].classList.remove('dead');
+            cells[currentRow + 1][i].classList.add('alive');
+          } else {
+            // Keep it dead
+          }
+        }
       }
     }
 
-    for (let i = 0; i < newCellsToCheck.length; i++) {
-      if(cellsToCheck.indexOf(newCellsToCheck[i]) === -1) {
-        cellsToCheck.push(newCellsToCheck[i]);
-      }
-    }
-
-    for(let i = 0; i < kill.length; i++) {
-      kill[i].classList.remove('dying');
-      kill[i].classList.add('dead');
-    }
-
-    for(let i = 0; i < revive.length; i++) {
-      revive[i].classList.remove('dead');
-      revive[i].classList.add('alive');
-    }
-
-    for(let i = 0; i < dying.length; i++) {
-      dying[i].classList.remove('alive');
-      dying[i].classList.add('dying');
-    }
+    currentRow++;
   }
 }
 
@@ -129,13 +131,14 @@ function changeSize() {
   size = parseInt(document.querySelector('.size_text').value);
   totalSize = size * 3;
 
-  cellsToCheck = [];
-  
   while (grid.firstChild) {
     grid.removeChild(grid.firstChild);
   }
 
   cells = createGrid(size, grid);
+  
+  //TODO: Change to 0
+  currentRow = size;
 
   startGame();
 }
@@ -199,41 +202,27 @@ function convertTextToGrid() {
       let r = i + size;
       let c = j + size;
 
-      if(preset[i][j] === 0) {
-        if(cells[r][c].classList.contains('alive')) {
-          cells[r][c].classList.remove('alive');
-          cells[r][c].classList.add('dead');
-        } else if(cells[r][c].classList.contains('dying')) {
-          cells[r][c].classList.remove('dying');
-          cells[r][c].classList.add('dead');
-        }
-      } else if(preset[i][j] === 1) {
+      if(preset[i][j]) {
         if(cells[r][c].classList.contains('dead')) {
           cells[r][c].classList.remove('dead');
           cells[r][c].classList.add('alive');
-        } else if(cells[r][c].classList.contains('dying')) {
-          cells[r][c].classList.remove('dying');
-          cells[r][c].classList.add('alive');
-        }
 
-        if(cellsToCheck.indexOf(cells[r][c]) === -1) {
-          cellsToCheck.push(cells[r][c]); 
-        }
+          if(cellsToCheck.indexOf(cells[r][c]) === -1) {
+            cellsToCheck.push(cells[r][c]); 
+          }
 
-        let neighbors = getAllNeighbors(cells[r][c]);
+          let neighbors = getAllNeighbors(cells[r][c]);
 
-        for (let i = 0; i < neighbors.length; i++) {
-          if(cellsToCheck.indexOf(neighbors[i]) === -1) {
-            cellsToCheck.push(neighbors[i]);
+          for (let i = 0; i < neighbors.length; i++) {
+            if(cellsToCheck.indexOf(neighbors[i]) === -1) {
+              cellsToCheck.push(neighbors[i]);
+            }
           }
         }
       } else {
         if(cells[r][c].classList.contains('alive')) {
           cells[r][c].classList.remove('alive');
-          cells[r][c].classList.add('dying');
-        } else if(cells[r][c].classList.contains('dead')) {
-          cells[r][c].classList.remove('dead');
-          cells[r][c].classList.add('dying');
+          cells[r][c].classList.add('dead');
         }
       }
     } 
@@ -251,19 +240,15 @@ function convertGridToText() {
     for (let j = size; j < 2 * size - 1; j++) {
       if(cells[i][j].classList.contains('alive')) {
         returnString += '1, ';
-      } else if(cells[i][j].classList.contains('dead')) {
-        returnString += '0, ';
       } else {
-        returnString += '2, ';
+        returnString += '0, ';
       }
     } 
 
     if(cells[i][2 * size - 1].classList.contains('alive')) {
       returnString += '1';
-    } else if(cells[i][2 * size - 1].classList.contains('dead')) {
-      returnString += '0';
     } else {
-      returnString += '2';
+      returnString += '0';
     }
 
     if(i < 2 * size - 1) {
@@ -340,83 +325,9 @@ function createGrid(size, grid) {
 function toggleCellState() {
   if(this.classList.contains('alive')) {
     this.classList.remove('alive');
-    this.classList.add('dying');
-  } else if(this.classList.contains('dead')) {
+    this.classList.add('dead');
+  } else {
     this.classList.remove('dead');
     this.classList.add('alive');
-
-    if(cellsToCheck.indexOf(this) === -1) {
-      cellsToCheck.push(this); 
-    }
-
-    let neighbors = getAllNeighbors(this);
-
-    for (let i = 0; i < neighbors.length; i++) {
-      if(cellsToCheck.indexOf(neighbors[i]) === -1) {
-        cellsToCheck.push(neighbors[i]);
-      }
-    }
-  } else {
-    this.classList.remove('dying');
-    this.classList.add('dead');
   }
 }
-
-function getAllNeighbors(cell) {
-  let neighbors = [];
-
-  let rowAndCol = cell.id.split(' ');
-  let i = parseInt(rowAndCol[0]);
-  let j = parseInt(rowAndCol[1]);
-
-  if(i - 1 >= 0 && j - 1 >= 0) {
-    let cell = cells[i - 1][j - 1];
-
-    neighbors.push(cell);
-  }
-
-  if(i - 1 >= 0) {
-    let cell = cells[i - 1][j];
-
-    neighbors.push(cell);
-  }
-
-  if(i - 1 >= 0 && j + 1 < totalSize) {
-    let cell = cells[i - 1][j + 1];
-
-    neighbors.push(cell);
-  }
-
-  if(j - 1 >= 0) {
-    let cell = cells[i][j - 1];
-
-    neighbors.push(cell);
-  }
-
-  if(j + 1 < totalSize) {
-    let cell = cells[i][j + 1];
-
-    neighbors.push(cell);
-  }
-
-  if(i + 1 < totalSize && j - 1 >= 0) {
-    let cell = cells[i + 1][j - 1];
-
-    neighbors.push(cell);
-  }
-
-  if(i + 1 < totalSize) {
-    let cell = cells[i + 1][j];
-
-    neighbors.push(cell);
-  }
-
-  if(i + 1 < totalSize && j + 1 < totalSize) {
-    let cell = cells[i + 1][j + 1];
-
-    neighbors.push(cell);
-  }
-
-  return neighbors;
-}
-

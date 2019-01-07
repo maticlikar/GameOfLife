@@ -36,6 +36,8 @@ startGame();
 /* Start of Functions */
 
 function startGame() {
+  rules();
+
   if(myInterval > 0) {
     clearInterval(myInterval);
   }
@@ -325,9 +327,11 @@ function createGrid(size, grid) {
           // The '-2' comes from the fact that the borders for each cell are 1px on each side
           cell.style.width = ((initWidth/size) - 2).toString() + 'px';
           cell.style.height = ((initHeight/size) - 2).toString() + 'px';
+          cell.style.border = '1px solid lightgray';
         } else {
           cell.style.width = ((initWidth/size)).toString() + 'px';
           cell.style.height = ((initHeight/size)).toString() + 'px';
+          cell.style.border = 'none';
         }
 
         grid.appendChild(cell);
